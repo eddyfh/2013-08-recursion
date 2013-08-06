@@ -4,56 +4,27 @@
 // but you don't so you're going to have to write it from scratch:
 var stringifyJSON = function (obj) {
   // your code goes here
-
-	var type = Object.prototype.toString.call(obj);
-	if (type == '[object Boolean]') {
-		if (obj == true) return 'true'; 
-		else return 'false';
-	}
-	else if (type == '[object Null]') {
-		return 'null';
-	}
-	else if (type == '[object Number]') {
-		return obj.toString();
-	}
-	else if (type == '[object String]') {
-		return '\"'+obj+'\"';
-
-	}
-	else if (type == '[object Array]') {
-		var str = '';		
-		var newarr = [];
-		for (var i = 0; i < obj.length; i++) {
-			newarr.push(stringifyJSON(obj[i]));
-		}
-		str = '['+newarr.join()+']';
-		return str;
-	}
-	else if (type == '[object Object]') {
-		var objstr = '';
-		var objarr = [];
-		var olength = 0;
-		for (var prop in obj) {
-			if (stringifyJSON(obj[prop]) != undefined)
-				olength++;
-		}
-		for (var prop in obj) {
-			if (stringifyJSON(obj[prop]) == undefined) {
-				objarr.push(null);
-			}
-			else {
-			objarr.push(stringifyJSON(prop));
-			objarr.push(':');
-			objarr.push(stringifyJSON(obj[prop]));
-			}
-			if (olength>1) {
-				objarr.push(',');
-				olength--;
-			}
-
-		}
-		objstr = '{'+objarr.join('')+'}';		
-		return objstr;
-	}
-
+    if (typeof(obj) === 'string') {
+      return '"' + obj + '"';
+    }
+    else if (typeof(obj) === 'number' || typeof(obj) === 'boolean') {
+      return obj.toString();
+    }
+    else if (_.isArray(obj)) {
+      return '[' + _.map(obj, stringifyJSON).join(',') + ']';
+    }
+    else if (obj && typeof(obj) === 'object') {
+      return '{' + _.filter(_.map(obj, function(value, key) {
+          if (!(typeof(value) === 'function' || value === undefined)) {
+            return stringifyJSON(key) + ':' + stringifyJSON(value);
+          }
+        }), function(el) {
+        if (el !== '') {
+          return el;
+        }
+      }).join(',') + '}';
+    }
+    else { //null
+      return obj + '';
+    }
 };

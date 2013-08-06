@@ -4,21 +4,39 @@
 // };
 
 // But in stead we're going to implement it from scratch:
-var getElementsByClassName = function (className) {
-  // your code here
-	var finalnode = [];
 
-	var checkNodes = function(input) {
-		if (input.classList && input.classList.contains(className)) {
-			finalnode.push(input);
-		}
-		if (input.childNodes) {
-			for (var item in input.childNodes) {
-				checkNodes(input.childNodes[item]);
-			}
-		}
-	};
+/*
+var getElementsByClassName = function (className, root) {
+  // your code here 
+  root = root || document.body;
+  var results = [];
 
-	checkNodes(document.body);
-	return finalnode;
+  if (root.classList && root.classList.contains(className)) {
+    results.push(root);
+  }
+
+  for (var i = 0; i < root.childNodes.length; i++) {
+    results = results.concat(getElementsByClassName(className, root.childNodes[i]));
+  }
+
+  return results;
+};
+*/
+
+var getElementsByClassName = function(className) {
+  var root = document.body;
+  var results = [];
+debugger
+  var checker = function(node) {
+    if (node.classList && node.classList.contains(className)) {
+      results.push(node);
+    }
+
+    for (var i = 0; i < node.childNodes.length; i++) {
+      checker(node.childNodes[i]);
+    }
+  };
+
+  checker(root);
+  return results;
 };
