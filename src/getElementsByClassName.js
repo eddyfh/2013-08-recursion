@@ -26,7 +26,7 @@ var getElementsByClassName = function (className, root) {
 var getElementsByClassName = function(className) {
   var root = document.body;
   var results = [];
-debugger
+
   var checker = function(node) {
     if (node.classList && node.classList.contains(className)) {
       results.push(node);
