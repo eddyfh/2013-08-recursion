@@ -7,6 +7,10 @@ angular.module('angyeoApp', [])
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
+      .when('/auth/facebook', {
+        templateUrl: 'views/fb.html',
+        controller: 'FbCtrl'
+      })
       .otherwise({
         redirectTo: '/asdf'
       });

@@ -12,8 +12,6 @@ app.use(passport.session());
 app.use(express.bodyParser());
 app.get('/', function(req, res){
   res.render('index.html');
-  // var body = 'heyhey!';
-  // res.send(body);
 });
 
 // MOVE THIS PASSPORT STUFF SOMEWHERE ELSE??
@@ -35,7 +33,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
     clientID: 507604689332034,
     clientSecret: 'c364629baf5f3bde83202fa80ed376b6',
-    callbackURL: "http://localhost:8000/auth/facebook/callback"
+    callbackURL: "http://localhost:8000/auth/facebook"
   },
 function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
@@ -67,8 +65,8 @@ app.get('/auth/facebook', passport.authenticate('facebook'));
 // authentication process by attempting to obtain an access token.  If
 // access was granted, the user will be logged in.  Otherwise,
 // authentication has failed.
-app.get('/auth/facebook/callback', 
-  passport.authenticate('facebook', { successRedirect: '/',
+app.get('/auth/facebook', 
+  passport.authenticate('facebook', { successRedirect: '/aaaa',
                                       failureRedirect: '/login' }));
 
 // app.post('/', function(req, res){
