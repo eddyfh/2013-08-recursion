@@ -1,8 +1,13 @@
 
 var express = require('express');
-var app = module.exports = express();
-var config = require('./app/config/config')[env];
+var app = module.exports = express(),
+    env       = process.env.NODE_ENV || 'development',
+    config = require('./config/config')[env];
 var port = 8000;
+// CAN PROBABLY REFACTOR CODE BELOW TO USE CONFIG.JS
+
+// save environment
+config['env'] = env;
 
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
@@ -19,6 +24,9 @@ app.set('view engine', 'ejs');
 app.get('/', function(req, res){
   res.render('index', { user: req.user });
 });
+
+// Database
+var db = require('./scripts/db')(app, config);
 
 // MOVE THIS PASSPORT STUFF SOMEWHERE ELSE??
 // Passport session setup.
@@ -88,42 +96,46 @@ app.get('/success', function(req, res){
 
 
 //MONGOOSE TEST
-var config = {};
-config.routes = {};
-config.routes.feed = '/user';
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:8000/newdb');
+// var config = {};
+// config.routes = {};
+// config.routes.feed = '/user';
+// var mongoose = require('mongoose');
+// mongoose.connect('mongodb://localhost:8000/newdb');
 
-Schema = mongoose.Schema;
-var User = new Schema({
-  username: String,
-  title: String
-});
-var userModel = mongoose.model('User', User);
-var user = new userModel();
+// Schema = mongoose.Schema;
+// var User = new Schema({
+//   username: String,
+//   title: String
+// });
+// var userModel = mongoose.model('User', User);
+// var user = new userModel();
 
-user.username = 'Chad';
-user.title = 'dev';
-user.save(function(err){
-  console.log('Saved, starting server...');
-  app.listen(8000);
-});
-app.configure(function(){
-  console.log('I will listen on '+config.routes.feed);
-});
+// user.username = 'Chad';
+// user.title = 'dev';
+// user.save(function(err){
+//   console.log('Saved, starting server...');
+//   app.listen(8000);
+// });
+// app.configure(function(){
+//   console.log('I will listen on '+config.routes.feed);
+// });
 
-app.get(config.routes.feed, function(req, res){
-  res.contentType('application/json');
-  userModel.findOne({'username':'Chad'}, function(err, user){
-    if (user !=null){
-      console.log('Found User: '+user.username);
-      res.send(JSON.stringify(user));
-    }
-  });
-});
+// app.get(config.routes.feed, function(req, res){
+//   res.contentType('application/json');
+//   userModel.findOne({'username':'Chad'}, function(err, user){
+//     if (user !=null){
+//       console.log('Found User: '+user.username);
+//       res.send(JSON.stringify(user));
+//     }
+//   });
+// });
 
-// app.listen(port);
-// console.log('Express server listening on port '+port);
+// Routes
+require('./scripts/routes')(app, config);
+
+
+app.listen(port);
+console.log('Express server listening on port '+port);
 
 
 
