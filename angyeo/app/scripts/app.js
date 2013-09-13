@@ -7,11 +7,11 @@ angular.module('angyeoApp', [])
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
-      .when('/success', {
-        templateUrl: 'views/fb.html',
-        controller: 'FbCtrl'
-      })
+    //   .when('/success', {
+    //     templateUrl: 'views/fb.html',
+    //     controller: 'FbCtrl'
+    //   })
       .otherwise({
-        redirectTo: '/asdf'
+        redirectTo: '/catchallurl'
       });
   });
