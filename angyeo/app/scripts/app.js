@@ -7,7 +7,7 @@ angular.module('angyeoApp', [])
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
-      .when('/auth/facebook', {
+      .when('/success', {
         templateUrl: 'views/fb.html',
         controller: 'FbCtrl'
       })

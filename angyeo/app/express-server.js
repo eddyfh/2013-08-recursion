@@ -1,17 +1,23 @@
 
 var express = require('express');
 var app = module.exports = express();
+var config = require('./app/config/config')[env];
 var port = 8000;
 
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
 
-app.use(express.static(__dirname));
+// app.set('view engine', 'ejs');
+app.use(express.cookieParser());
+app.use(express.session({ secret: 'keyboard cat' }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static(__dirname));
 app.use(express.bodyParser());
+app.set('view engine', 'ejs');
+
 app.get('/', function(req, res){
-  res.render('index.html');
+  res.render('index', { user: req.user });
 });
 
 // MOVE THIS PASSPORT STUFF SOMEWHERE ELSE??
@@ -31,9 +37,9 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new FacebookStrategy({
-    clientID: 507604689332034,
+    clientID: '507604689332034',
     clientSecret: 'c364629baf5f3bde83202fa80ed376b6',
-    callbackURL: "http://localhost:8000/auth/facebook"
+    callbackURL: "http://localhost:8000/auth/facebook/callback"
   },
 function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
@@ -48,7 +54,7 @@ function(accessToken, refreshToken, profile, done) {
   }
 ));
 
-// USE THIS
+// USE THIS?
 // function(accessToken, refreshToken, profile, done) {
 //     User.findOrCreate({ facebookId: profile.id }, function (err, user) {
 //       return done(err, user);
@@ -65,9 +71,13 @@ app.get('/auth/facebook', passport.authenticate('facebook'));
 // authentication process by attempting to obtain an access token.  If
 // access was granted, the user will be logged in.  Otherwise,
 // authentication has failed.
-app.get('/auth/facebook', 
-  passport.authenticate('facebook', { successRedirect: '/aaaa',
+app.get('/auth/facebook/callback', 
+  passport.authenticate('facebook', { successRedirect: '/success',
                                       failureRedirect: '/login' }));
+
+app.get('/success', function(req, res){
+  res.render('fb', { user: req.user });
+});
 
 // app.post('/', function(req, res){
 //   console.log(req.body);
@@ -76,8 +86,44 @@ app.get('/auth/facebook',
 //   // res.redirect('back');
 // });
 
-app.listen(port);
-console.log('Express server listening on port '+port);
+
+//MONGOOSE TEST
+var config = {};
+config.routes = {};
+config.routes.feed = '/user';
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:8000/newdb');
+
+Schema = mongoose.Schema;
+var User = new Schema({
+  username: String,
+  title: String
+});
+var userModel = mongoose.model('User', User);
+var user = new userModel();
+
+user.username = 'Chad';
+user.title = 'dev';
+user.save(function(err){
+  console.log('Saved, starting server...');
+  app.listen(8000);
+});
+app.configure(function(){
+  console.log('I will listen on '+config.routes.feed);
+});
+
+app.get(config.routes.feed, function(req, res){
+  res.contentType('application/json');
+  userModel.findOne({'username':'Chad'}, function(err, user){
+    if (user !=null){
+      console.log('Found User: '+user.username);
+      res.send(JSON.stringify(user));
+    }
+  });
+});
+
+// app.listen(port);
+// console.log('Express server listening on port '+port);
 
 
 
