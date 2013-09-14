@@ -48,10 +48,14 @@ app.get('/api', function(req,res){
   })
 });
 
+// TRY TO FIGURE OUT HOW TO GET THIS POST TO WORK
 app.post('/dbPost', function(req, res){
   console.log('In DB Post');
+  
   var compName = req.query[0];
-  User.update({userId: '704345'}, {$push: {'following': ['compName']}});// CHANGE USER ID TO VARIABLE LATER
+  User.update({userId: '704345'}, {$push: {'following': compName }}, function(){
+    console.log('update executed');
+  });// CHANGE USER ID TO VARIABLE LATER
 });
 
 // Database

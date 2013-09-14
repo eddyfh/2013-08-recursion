@@ -43,7 +43,7 @@ angular.module('angyeoApp')
     
     $scope.userFollow = function(name){
       $scope.follow.push(name);
-      $http({method: 'POST', url: '/dbPost'}).success(function(){
+      $http({method: 'POST', url: '/dbPost', params: [name]}).success(function(){
         console.log('added to DB');
       });
     };
