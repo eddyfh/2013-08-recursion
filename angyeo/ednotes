@@ -5,3 +5,7 @@ todo:
 - pull down corresponding crunchbase summary info
 - button to add to watch list
 - 
+
+
+first thing on page load is check if valid user logged in
+change response so ang knows what to render

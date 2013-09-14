@@ -1,6 +1,9 @@
 // need these two lines?
 var mongoose = require('mongoose');
 
+//check location of below
+var superagent = require('superagent');
+
 
 var express = require('express');
 var app = module.exports = express(),
@@ -17,7 +20,10 @@ var passport = require('passport')
 
 // app.set('view engine', 'ejs');
 app.use(express.cookieParser());
+// use express.session before passport, so that passport session will work
 app.use(express.session({ secret: 'keyboard cat' }));
+// Initialize Passport!  Also use passport.session() middleware, to support
+// persistent login sessions (recommended).
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(__dirname));
@@ -25,12 +31,21 @@ app.use(express.bodyParser());
 app.set('view engine', 'ejs');
 
 app.get('/', function(req, res){
-  res.render('index', { user: req.user });
+  res.render('index', { thingy: req.user });
 });
 
-// app.get('/success', function(req, res){
-//   res.render('index', { user: req.user });
-// });
+app.get('/asdf', function(req, res){
+  res.render('test', { tester: true});
+});
+
+// API server test
+app.get('/api', function(req,res){
+  superagent.get('http://api.crunchbase.com/v/1/companies/posts?name=Google&api_key=a72hgev95qzstgam5aukbeqe')
+  .end(function(response){
+    console.log('/api called correctly');
+    res.render('test2', {response: response});
+  })
+});
 
 // Database
 // var data = require('./scripts/db');
@@ -52,11 +67,13 @@ var User = mongoose.model('User', userSchema);
 //   have a database of user records, the complete Facebook profile is serialized
 //   and deserialized.
 passport.serializeUser(function(user, done) {
-  done(null, user);
+  done(null, user.id);
 });
 
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
 });
 
 passport.use(new FacebookStrategy({
@@ -66,8 +83,8 @@ passport.use(new FacebookStrategy({
   },
   function(accessToken, refreshToken, profile, done) {
     User.findOne({ userId: profile.id}, function(err, user) {
-      console.log(profile);
-      console.log('------------------');
+      // console.log(profile);
+      // console.log('------------------');
       if (err) { return done(err);}
       if (!user) {
         var newuser = new User({
@@ -105,8 +122,12 @@ app.get('/auth/facebook', passport.authenticate('facebook'));
 // access was granted, the user will be logged in.  Otherwise,
 // authentication has failed.
 app.get('/auth/facebook/callback', 
-  passport.authenticate('facebook', { successRedirect: '/',
-                                      failureRedirect: '/login' }));
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // alert('alskdf');
+    // res.render('index', { user: req.user });
+    res.redirect('/asdf');
+  });
 
 // app.get('/success', function(req, res){
 //   res.render('index');
