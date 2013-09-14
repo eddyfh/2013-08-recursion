@@ -9,6 +9,7 @@ angular.module('angyeoApp')
     ];
     $scope.queries = [];
     $scope.follow = [];
+    $scope.queried = false;
 
     $scope.checkPosts = function(name){
     //   $http({
@@ -22,9 +23,9 @@ angular.module('angyeoApp')
     //   });
     };
 
-    $scope.userSubmit = function(query){
-      $http.get('/api').success(function(postdata){
-        $scope.postData = 'testest';
+    $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
+      $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
+        $scope.numPosts = postdata['num_posts'];
       });
 
       $http({
@@ -38,9 +39,13 @@ angular.module('angyeoApp')
         console.log('ERROR!');
       });
     };
+
     
     $scope.userFollow = function(name){
       $scope.follow.push(name);
+      $http({method: 'POST', url: '/dbPost'}).success(function(){
+        console.log('added to DB');
+      });
     };
 
     $scope.authenticated = function(user){
@@ -57,9 +62,10 @@ angular.module('angyeoApp')
     $scope.showfunc = function(){
       return false;
     };
-  }])
-  .controller('NewCtrl', ['$scope', function($scope){}
-  ]);
+  }]);
+  // .controller('NewCtrl', ['$scope', function($scope){}
+  //   $scope.testData;
+  // ]);
 
 
 

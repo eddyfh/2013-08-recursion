@@ -1,6 +1,7 @@
 // need these two lines?
 var mongoose = require('mongoose');
 
+var apikey = 'a72hgev95qzstgam5aukbeqe';
 //check location of below
 var superagent = require('superagent');
 
@@ -39,12 +40,18 @@ app.get('/asdf', function(req, res){
 });
 
 // API server test
-app.get('/api', function(req,res){
-  superagent.get('http://api.crunchbase.com/v/1/companies/posts?name=Google&api_key=a72hgev95qzstgam5aukbeqe')
+app.get('/api', function(req,res){ 
+  var compName = req.query[0]; // THIS SHOULD BE MADE MORE GENERIC
+  superagent.get('http://api.crunchbase.com/v/1/companies/posts?name='+compName+'&api_key='+apikey)
   .end(function(response){
-    console.log('/api called correctly');
-    res.render('test2', {response: response});
+    res.send(response.res.text);
   })
+});
+
+app.post('/dbPost', function(req, res){
+  console.log('In DB Post');
+  var compName = req.query[0];
+  User.update({userId: '704345'}, {$push: {'following': ['compName']}});// CHANGE USER ID TO VARIABLE LATER
 });
 
 // Database
@@ -55,7 +62,7 @@ var userSchema = mongoose.Schema({
   username: 'string',
   displayname: 'string',
   queried: 'mixed',
-  following: 'mixed'
+  following: 'array'
 });
 var User = mongoose.model('User', userSchema);
 // MOVE THIS PASSPORT STUFF SOMEWHERE ELSE!!!
@@ -90,9 +97,8 @@ passport.use(new FacebookStrategy({
         var newuser = new User({
           userId: profile.id,
           username: profile.username,
-          displayname: profile.displayName,
-          queried: {},
-          following: {}
+          displayname: profile.displayName
+          
         });
         newuser.save();
         return done(null, newuser);
