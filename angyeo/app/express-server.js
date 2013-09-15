@@ -48,14 +48,17 @@ app.get('/api', function(req,res){
   })
 });
 
-// TRY TO FIGURE OUT HOW TO GET THIS POST TO WORK
 app.post('/dbPost', function(req, res){
-  console.log('In DB Post');
-  
-  var compName = req.query[0];
-  User.update({userId: '704345'}, {$push: {'following': compName }}, function(){
-    console.log('update executed');
-  });// CHANGE USER ID TO VARIABLE LATER
+  console.log(req.query[0]);
+  var newentry = {};
+  newentry[req.query[0]] = req.query[1];
+  // var posts = req.query[1];
+  var setvar = {$push: {}};
+  setvar.$push['following'] = newentry;
+  console.log(setvar);
+  User.update({userId: '704345'}, setvar, function(){
+    // can do something here
+  });
 });
 
 // Database
@@ -66,7 +69,7 @@ var userSchema = mongoose.Schema({
   username: 'string',
   displayname: 'string',
   queried: 'mixed',
-  following: 'array'
+  following: 'mixed'
 });
 var User = mongoose.model('User', userSchema);
 // MOVE THIS PASSPORT STUFF SOMEWHERE ELSE!!!
@@ -102,7 +105,6 @@ passport.use(new FacebookStrategy({
           userId: profile.id,
           username: profile.username,
           displayname: profile.displayName
-          
         });
         newuser.save();
         return done(null, newuser);
@@ -136,7 +138,7 @@ app.get('/auth/facebook/callback',
   function(req, res) {
     // alert('alskdf');
     // res.render('index', { user: req.user });
-    res.redirect('/asdf');
+    res.redirect('/');
   });
 
 // app.get('/success', function(req, res){
