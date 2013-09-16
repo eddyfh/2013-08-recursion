@@ -1,16 +1,21 @@
 // need these two lines?
 var mongoose = require('mongoose');
-
 var apikey = 'a72hgev95qzstgam5aukbeqe';
 //check location of below
-var superagent = require('superagent');
+var request = require('request');
 
 
 var express = require('express');
 var app = module.exports = express(),
+    http = require('http'),
+    server = http.createServer(app),
+    io = require('socket.io').listen(server),
     env       = process.env.NODE_ENV || 'development',
+    port = 8000;
     config = require('./config/config')[env];
-var port = 8000;
+
+server.listen(port);
+
 // CAN PROBABLY REFACTOR CODE BELOW TO USE CONFIG.JS
 
 // save environment
@@ -31,22 +36,8 @@ app.use(express.static(__dirname));
 app.use(express.bodyParser());
 app.set('view engine', 'ejs');
 
-app.get('/', function(req, res){
-  res.render('index', { thingy: req.user });
-});
 
-app.get('/asdf', function(req, res){
-  res.render('test', { tester: true});
-});
 
-// API server test
-app.get('/api', function(req,res){ 
-  var compName = req.query[0]; // THIS SHOULD BE MADE MORE GENERIC
-  superagent.get('http://api.crunchbase.com/v/1/companies/posts?name='+compName+'&api_key='+apikey)
-  .end(function(response){
-    res.send(response.res.text);
-  })
-});
 
 app.post('/dbPost', function(req, res){
   console.log(req.query[0]);
@@ -196,7 +187,11 @@ app.get('/login', function(req, res){ // this is for failed login
 require('./scripts/routes')(app, config);
 
 
-app.listen(port);
+
+
+io.sockets.on('connection', function (socket) {
+  socket.emit('twitter', { hello: 'world' });
+});
 console.log('Express server listening on port '+port);
 
 
