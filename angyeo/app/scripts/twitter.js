@@ -1,6 +1,6 @@
 var twitter = require('ntwitter');
 var app = require('../express-server');
-var io = require('socket.io').listen(app);
+var io = app.io;
 
 var twit = new twitter({
   consumer_key: 'jLuObgS6Yxg2j0Vog0vog',
@@ -10,38 +10,42 @@ var twit = new twitter({
 });
 
 module.exports = function() {
+	// io.sockets.on('connection', function (socket) {
+	//   socket.emit('twitter', { hello: 'world' });
+	// });
+
 	io.sockets.on('connection', function (socket) {
 		console.log('in socket');
-		var parseTweet = function(tweet) {
-	    if(!tweet.text) {
-	      return;
-	    }
+		// var parseTweet = function(tweet) {
+	 //    if(!tweet.text) {
+	 //      return;
+	 //    }
 
-		// store the body of the tweet
-	    var text = tweet.text;
+		// // store the body of the tweet
+	 //    var text = tweet.text;
 
 
-	  // get everything we want to store
-	  var user = tweet.user,
-	     t = [ 
-	     tweet.user.screen_name, 
-	     user.id, 
-	     tweet.id_str, 
-	     tweet.created_at, 
-	     text, 
-	     user.followers_count, 
-	     user.statuses_count,
-	     tweet.coordinates 
-	  ];
-	  // add it to the DB
-	  console.log(t);
-		}; 
+	 //  // get everything we want to store
+		//   var user = tweet.user,
+		//      t = [ 
+		//      tweet.user.screen_name, 
+		//      user.id, 
+		//      tweet.id_str, 
+		//      tweet.created_at, 
+		//      text, 
+		//      user.followers_count, 
+		//      user.statuses_count,
+		//      tweet.coordinates 
+		//   ];
+		  // add it to the DB
+		  // console.log(t.text);
+		// }; 
 
 		console.log('in twitter func');
-		twit.stream('statuses/filter', {track: 'apple'}, function(stream) {
+		twit.stream('statuses/filter', {track: 'linkedin'}, function(stream) {
 		  stream.on('data', function (data) {
 		    // console.log(data);
-		    parseTweet(data);
+		    // parseTweet(data);
 			  socket.emit('twitter', data);
 		  });
 		  // console.log(stream);

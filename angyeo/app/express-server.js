@@ -9,9 +9,9 @@ var express = require('express');
 var app = module.exports = express(),
     http = require('http'),
     server = http.createServer(app),
-    io = require('socket.io').listen(server),
+    io = module.exports.io = require('socket.io').listen(server),
     env       = process.env.NODE_ENV || 'development',
-    port = 8000;
+    port = 8000,
     config = require('./config/config')[env];
 
 server.listen(port);
@@ -186,12 +186,12 @@ app.get('/login', function(req, res){ // this is for failed login
 // Routes
 require('./scripts/routes')(app, config);
 
+// Run twitter
+require('./scripts/twitter')();
 
-
-
-io.sockets.on('connection', function (socket) {
-  socket.emit('twitter', { hello: 'world' });
-});
+// io.sockets.on('connection', function (socket) {
+//   socket.emit('twitter', { hello: 'world' });
+// });
 console.log('Express server listening on port '+port);
 
 

@@ -29,7 +29,15 @@
     <input type = 'submit' value = 'Follow' ng-click='userFollow(listing.name)'/>
     <!-- <input type = 'submit' value = 'Twittertest' ng-click='TwitTest()'/> -->
   </div>
+
+  <div>Twitter stream
+    <div>{{tweets.user.screen_name}}: {{tweets.text}} 
+      <img src="{{tweets.user.profile_image_url}}"/>
+    </div>
+  </div>
 </div>
+
+
 
 <!--
 onerror="this.style.display='none'"

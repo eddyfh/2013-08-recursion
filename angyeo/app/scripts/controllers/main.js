@@ -10,6 +10,16 @@ angular.module('angyeoApp')
     $scope.queries = [];
     $scope.follow = [];
     $scope.queried = false;
+    $scope.tweets = [];
+
+    // twitterstream
+    var socket = io.connect('http://localhost');
+    socket.on('twitter', function (data) {
+      $scope.tweets = data;
+      $scope.$apply();
+      // console.log(data);
+      // socket.emit('my other event', { my: 'data' });
+    });
 
     $scope.checkPosts = function(name){
     //   $http({
@@ -38,6 +48,7 @@ angular.module('angyeoApp')
     }).error(function(data, status){
         console.log('ERROR!');
       });
+
     };
 
     
@@ -51,6 +62,9 @@ angular.module('angyeoApp')
     $scope.authenticated = function(user){
       console.log(user);
       return user;
+    };
+    
+    $scope.twitterStream = function(){
     };
     
   }])
