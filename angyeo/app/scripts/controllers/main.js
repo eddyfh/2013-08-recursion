@@ -15,9 +15,9 @@ angular.module('angyeoApp')
     // twitterstream
     var socket = io.connect('http://localhost');
     socket.on('twitter', function (data) {
+      // TURN ON LINES BELOW
       $scope.tweets = data;
       $scope.$apply();
-      // console.log(data);
       // socket.emit('my other event', { my: 'data' });
     });
 
@@ -34,9 +34,9 @@ angular.module('angyeoApp')
     };
 
     $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
-      $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
-        $scope.numPosts = postdata['num_posts'];
-      });
+      // $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
+      //   $scope.numPosts = postdata['num_posts'];
+      // });
 
       $http({
       method: 'JSONP',
@@ -54,8 +54,8 @@ angular.module('angyeoApp')
     
     $scope.userFollow = function(name){
       $scope.follow.push(name);
-      $http({method: 'POST', url: '/dbPost', params: [name, $scope.numPosts]}).success(function(){
-        console.log('added to DB');
+      $http({method: 'POST', url: '/followPost', params: [name]}).success(function(){
+        // console.log('added to DB');
       });
     };
 
@@ -76,21 +76,13 @@ angular.module('angyeoApp')
     $scope.showfunc = function(){
       return false;
     };
+  }])
+  .factory('UserService', [function(){
+    var userObj = {
+      isLogged: false,
+      username: ''
+    };
   }]);
   // .controller('NewCtrl', ['$scope', function($scope){}
   //   $scope.testData;
   // ]);
-
-
-
-  // THIS WORKS FOR CRUNCHBASE SEARCH
-  // $http({
-  //     method: 'JSONP',
-  //     url: 'http://api.crunchbase.com/v/1/search.js?query=orderahead&api_key=a72hgev95qzstgam5aukbeqe&callback=JSON_CALLBACK'
-  //   }).success(function(data){
-  //       console.log(data);
-  //   }).error(function(data, status){
-  //     console.log(data);
-  //       console.log('ERROR!');
-  //     });
-  //   };

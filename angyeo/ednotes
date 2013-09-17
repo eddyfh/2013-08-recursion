@@ -1,10 +1,7 @@
 changed 'main.scss' to 'main.css' in styles folder
 
 todo:
-- allow users to enter in company name in search
-- pull down corresponding crunchbase summary info
-- button to add to watch list
-- 
+
 
 
 first thing on page load is check if valid user logged in
@@ -27,3 +24,19 @@ for get, return db info
 for post, 
 post data to server
 server updates db
+
+Goal - help entrepreneurs or VCs follow companies/sector
+JTBD - i need to know when things happen to companies or similar companies
+
+user flow
+- log in
+- enter in sector(s)
+- enter company names
+- suggest similar companies
+- show profile of company
+- allow user to follow
+for followed companies:
+- email when TC article appears or twitter mention
+custom view
+- news about companies or similar companies since last login
+- just investments/financings vs other

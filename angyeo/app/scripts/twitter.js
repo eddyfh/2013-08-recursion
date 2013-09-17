@@ -10,12 +10,21 @@ var twit = new twitter({
 });
 
 module.exports = function() {
+
+	io.sockets.on('connection', function (socket) {
+		twit.stream('statuses/filter', {track: 'linkedin'}, function(stream) {
+		  stream.on('data', function (data) {
+		  	// TURN BELOW ON
+			  // socket.emit('twitter', data);
+		  });
+		});
+	});
+};
 	// io.sockets.on('connection', function (socket) {
 	//   socket.emit('twitter', { hello: 'world' });
 	// });
 
-	io.sockets.on('connection', function (socket) {
-		console.log('in socket');
+		// console.log('in socket');
 		// var parseTweet = function(tweet) {
 	 //    if(!tweet.text) {
 	 //      return;
@@ -41,21 +50,14 @@ module.exports = function() {
 		  // console.log(t.text);
 		// }; 
 
-		console.log('in twitter func');
-		twit.stream('statuses/filter', {track: 'linkedin'}, function(stream) {
-		  stream.on('data', function (data) {
+		// console.log('in twitter func');
+
 		    // console.log(data);
 		    // parseTweet(data);
-			  socket.emit('twitter', data);
-		  });
 		  // console.log(stream);
-		});
 		// console.log(newstream);
 		// return newstream;
 	  // socket.on('my other event', function (data) {
 	  //   console.log(data);
 	  // });
-	});
-};
-
 
