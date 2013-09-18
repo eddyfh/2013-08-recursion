@@ -1,29 +1,12 @@
 changed 'main.scss' to 'main.css' in styles folder
 
 todo:
-
+QUESTIONS FOR LARRY
+- Best way to periodically check for updates (so that we can send email updates)? setinterval?
 
 
 first thing on page load is check if valid user logged in
 change response so ang knows what to render
-
-- database
-collection: USERS
-  userId: 'number',
-  username: 'string',
-  displayname: 'string',
-  queried: 'mixed',
-  following: 'mixed'
-
-in controller, 
-get follows function
-post follow function
-
-server
-for get, return db info
-for post, 
-post data to server
-server updates db
 
 Goal - help entrepreneurs or VCs follow companies/sector
 JTBD - i need to know when things happen to companies or similar companies

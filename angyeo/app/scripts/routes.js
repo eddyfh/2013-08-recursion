@@ -3,6 +3,7 @@ var twitter = require('./twitter');
 var request = require('request');
 var apikey = require('../express-server').apikey;
 var User = require('../express-server').User;
+// var rss = require('../rsstest'); // this file should be moved
 
 module.exports = function(app, config){
   app.post('/newacct', function(req, res, next){
@@ -38,6 +39,13 @@ module.exports = function(app, config){
 	  });
 	});
 
+	// app.get('/rss', function(req, res){
+	// 	console.log('==getting rss data==');
+	// 	var results = rss();
+	// 	console.log(results);
+	// 	res.send(results);
+	// });
+
 // First retrieves existing companies, then adds new company to follow
 	app.post('/followPost', function(req, res){
 		var companyName = req.query[0];
@@ -58,6 +66,17 @@ module.exports = function(app, config){
 		  });
 			
 		});
+	});
+
+	app.get('/startTwitter', function(req, res){
+		var following = JSON.parse(req.query[0]);
+		console.dir(following);
+		var followString=[];
+		for (var key in following){
+      followString.push(key);
+		};
+		followString = followString.join();
+		twitter(followString);
 	});
 
 	// Twitter test

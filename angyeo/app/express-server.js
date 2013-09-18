@@ -12,10 +12,11 @@ var app = module.exports = express(),
     config = require('./config/config')[env];
 var apikey = module.exports.apikey = 'a72hgev95qzstgam5aukbeqe';
 
+
 server.listen(port);
 
 // Run twitter
-require('./scripts/twitter')();
+// require('./scripts/twitter')();
 
 // CAN PROBABLY REFACTOR CODE BELOW TO USE CONFIG.JS
 
@@ -184,10 +185,8 @@ app.get('/loggedin', function(req, res) {
 
 // Routes
 require('./scripts/routes')(app, config);
-
+require('./rsstest')(app); // clean this up
 console.log('Express server listening on port '+port);
-
-
 
 
 /*

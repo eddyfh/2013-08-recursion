@@ -10,6 +10,13 @@ angular.module('angyeoApp')
     // Retrieves logged in user's data and saves to $scope.user
     $http.get('/loggedin').success(function(user){
       $scope.user = user;
+      $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
+      });
+      //RSS Feed
+      $http.get('/rss').success(function(feedData){
+        $scope.rssData = feedData;
+      });
+      
       if ($scope.user.following){
         for (var key in $scope.user.following) {
           $scope.follow.push(key);
@@ -21,13 +28,14 @@ angular.module('angyeoApp')
       $http.post('/logout');
     };
 
-    // twitterstream
+    // TWITTERSTREAM - this only works for 1 user right now
     var socket = io.connect('http://localhost');
     socket.on('twitter', function (data) {
       $scope.tweets = data;
       $scope.$apply();
       // socket.emit('my other event', { my: 'data' });
     });
+
 
     $scope.checkPosts = function(name){
     //   $http({

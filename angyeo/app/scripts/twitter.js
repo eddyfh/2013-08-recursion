@@ -9,10 +9,10 @@ var twit = new twitter({
   access_token_secret: 'kqnOrK8iND1WaX74GC6Jso6ORdp32a2kTw0fAxSlbr8'
 });
 
-module.exports = function() {
+module.exports = function(companies) {
 
 	io.sockets.on('connection', function (socket) {
-		twit.stream('statuses/filter', {track: 'linkedin'}, function(stream) {
+		twit.stream('statuses/filter', {track: companies}, function(stream) {
 		  stream.on('data', function (data) {
 		  	// TURN BELOW ON
 			  // socket.emit('twitter', data);
