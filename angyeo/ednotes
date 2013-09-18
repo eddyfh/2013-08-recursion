@@ -3,6 +3,8 @@ changed 'main.scss' to 'main.css' in styles folder
 todo:
 QUESTIONS FOR LARRY
 - Best way to periodically check for updates (so that we can send email updates)? setinterval?
+- best way to suggest similar companies?
+- best way to show most popular articles since last login? popularity of link, article or topic for a time frame?
 
 
 first thing on page load is check if valid user logged in
@@ -10,6 +12,9 @@ change response so ang knows what to render
 
 Goal - help entrepreneurs or VCs follow companies/sector
 JTBD - i need to know when things happen to companies or similar companies
+
+- Get customized view of news on competitors
+- email updates
 
 user flow
 - log in
@@ -23,3 +28,10 @@ for followed companies:
 custom view
 - news about companies or similar companies since last login
 - just investments/financings vs other
+
+Techmeme
+http://www.techmeme.com/feed.xml
+Pando
+http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss
+TC
+http://techcrunch.com/rssfeeds/
