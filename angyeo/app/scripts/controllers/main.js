@@ -2,20 +2,28 @@
 
 angular.module('angyeoApp')
   .controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
     $scope.queries = [];
     $scope.follow = [];
     $scope.queried = false;
     $scope.tweets = [];
+    $scope.user;
+    // Retrieves logged in user's data and saves to $scope.user
+    $http.get('/loggedin').success(function(user){
+      $scope.user = user;
+      if ($scope.user.following){
+        for (var key in $scope.user.following) {
+          $scope.follow.push(key);
+        } 
+      }
+    });
+
+    $scope.logout = function(){
+      $http.post('/logout');
+    };
 
     // twitterstream
     var socket = io.connect('http://localhost');
     socket.on('twitter', function (data) {
-      // TURN ON LINES BELOW
       $scope.tweets = data;
       $scope.$apply();
       // socket.emit('my other event', { my: 'data' });
@@ -54,7 +62,7 @@ angular.module('angyeoApp')
     
     $scope.userFollow = function(name){
       $scope.follow.push(name);
-      $http({method: 'POST', url: '/followPost', params: [name]}).success(function(){
+      $http({method: 'POST', url: '/followPost', params: [name, $scope.user.userId]}).success(function(){
         // console.log('added to DB');
       });
     };
@@ -76,12 +84,12 @@ angular.module('angyeoApp')
     $scope.showfunc = function(){
       return false;
     };
-  }])
-  .factory('UserService', [function(){
-    var userObj = {
-      isLogged: false,
-      username: ''
-    };
+  // }])
+  // .factory('UserService', [function(){
+  //   var userObj = {
+  //     isLogged: false,
+  //     username: ''
+  //   };
   }]);
   // .controller('NewCtrl', ['$scope', function($scope){}
   //   $scope.testData;

@@ -66,6 +66,14 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
+// Middleware function to be used for secured routes
+var auth = function(req, res, next){
+  if (!req.isAuthenticated()) 
+    res.send(401);
+  else
+    next();
+};
+
 passport.use(new FacebookStrategy({
     clientID: '507604689332034',
     clientSecret: 'c364629baf5f3bde83202fa80ed376b6',
@@ -123,6 +131,12 @@ app.get('/auth/facebook/callback',
 
 app.get('/login', function(req, res){ // this is for failed login
   res.render('test', { user: req.user });
+});
+
+app.get('/loggedin', function(req, res) {
+  console.log('In /loggedin - user is:');
+  console.log(req.user);
+  res.send(req.isAuthenticated() ? req.user : '0');
 });
 
 // app.post('/', function(req, res){

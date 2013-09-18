@@ -2,15 +2,16 @@
   <h1>Welcome to crunchlytics</h1>
   <!-- <div ng-show='authenticated(tester)'> Log in below </div>
   <div ng-show='authenticated(tester)'> if you're logged in, your username is {{user}}</div> -->
-  <h3>This is blah blah</h3>
-  <a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a>
+  <h3>User info: {{user}}</h3>
+  <!-- <a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a> -->
+  <a href="/" ng-click="logout()">Logout</a>
   <br><br>
+
   
-
-
     Search for a company: <input id='userQuery' ng-model='userSearch'/>
     <input type = 'submit' value = 'Submit' ng-click="userSubmit(userSearch)">
     <script>document.getElementById('userQuery').focus()</script>
+    
     <p>Your current list of searches is:</p>
     <ul ng-repeat='listing in queries'>
       <li>{{listing.name}}</li>
@@ -20,16 +21,16 @@
     <ul ng-repeat='listing in follow'>
       <li>{{listing}}</li>
     </ul>
-  <div ng-repeat='listing in queries'>
-    <img src="http://www.crunchbase.com/{{listing.image.available_sizes[0][1]}}" height='70'/>
-    <br>
-    <a href src= "{{listing.homepage_url}}">{{listing.name}}</a>
-    <div ng-bind-html-unsafe='listing.overview'></div>
-    <div>Count is {{numPosts}}</div>
-    <input type = 'submit' value = 'Follow' ng-click='userFollow(listing.name)'/>
-    {{listing.name}} 
-    <!-- <input type = 'submit' value = 'Twittertest' ng-click='TwitTest()'/> -->
-  </div>
+    <div ng-repeat='listing in queries'>
+      <img src="http://www.crunchbase.com/{{listing.image.available_sizes[0][1]}}" height='70'/>
+      <br>
+      <a href src= "{{listing.homepage_url}}">{{listing.name}}</a>
+      <div ng-bind-html-unsafe='listing.overview'></div>
+      <div>Count is {{numPosts}}</div>
+      <input type = 'submit' value = 'Follow' ng-click='userFollow(listing.name)'/>
+      {{listing.name}} 
+      <!-- <input type = 'submit' value = 'Twittertest' ng-click='TwitTest()'/> -->
+    </div>
 
   <div>Twitter stream
     <div>{{tweets.user.screen_name}}: {{tweets.text}} 

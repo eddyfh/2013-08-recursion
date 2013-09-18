@@ -14,11 +14,16 @@ module.exports = function(app, config){
   });
 
   app.get('/', function(req, res){
-	  res.render('index', { thingy: req.user });
+	  res.render('index', { user: req.user });
 	});
 
 	app.get('/asdf', function(req, res){
 	  res.render('test', { tester: true});
+	});
+
+	app.post('/logout', function(req, res){
+		req.logOut();
+		res.redirect('/');
 	});
 
 	// API server test
@@ -33,23 +38,26 @@ module.exports = function(app, config){
 	  });
 	});
 
-// FIX BELOW SO THAT USERID CHANGES
+// First retrieves existing companies, then adds new company to follow
 	app.post('/followPost', function(req, res){
-		// console.log(req.query);
-		// console.log('req query 0 is '+req.query[0]);
 		var companyName = req.query[0];
-		var followEntry = {}; // structure for new entry
-		request.get({
-			url: 'http://api.crunchbase.com/v/1/companies/posts?name='+companyName+'&api_key='+apikey,
-			json: true}, 
-		function(e,response, body){
-			followEntry[companyName] = body['num_posts'];
-		  var setvar = {$push: {}};
-		  setvar.$push['following'] = followEntry; // Need to do it this way to use update properly
-		  User.update({userId: '704345'}, setvar, function(){
-	      // can do something here
-			});
-	  });
+		var reqUserId = req.query[1];
+		User.find({userId: reqUserId}, function(err, user){
+			var companiesFollowed = user[0]['following'] || {};
+			// Get # of posts from crunchbase for given company
+			request.get({
+				url: 'http://api.crunchbase.com/v/1/companies/posts?name='+companyName+'&api_key='+apikey,
+				json: true}, 
+			function(e,response, body){
+				companiesFollowed[companyName] = body['num_posts'];
+			  var setvar = {$set: {}};
+			  setvar.$set['following'] = companiesFollowed; // Need to do it this way to use update properly
+			  User.update({userId: reqUserId}, setvar, function(){
+		      // can do something here
+				});
+		  });
+			
+		});
 	});
 
 	// Twitter test
