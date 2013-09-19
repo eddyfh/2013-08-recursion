@@ -1,8 +1,9 @@
 var db = require('./db');
+var User = db.User;
 var twitter = require('./twitter');
 var request = require('request');
 var apikey = require('../express-server').apikey;
-var User = require('../express-server').User;
+var passport = require('passport');
 // var rss = require('../rsstest'); // this file should be moved
 
 module.exports = function(app, config){
@@ -77,6 +78,32 @@ module.exports = function(app, config){
 		};
 		followString = followString.join();
 		twitter(followString);
+	});
+
+	// Redirect the user to Facebook for authentication.  
+	// Fb redirects user to: /auth/facebook/callback
+	app.get('/auth/facebook', passport.authenticate('facebook'));
+
+	// Facebook will redirect the user to this URL after approval.  Finish the
+	// authentication process by attempting to obtain an access token.  If
+	// access was granted, the user will be logged in.  Otherwise,
+	// authentication has failed.
+	app.get('/auth/facebook/callback', 
+	  passport.authenticate('facebook', { failureRedirect: '/login' }),
+	  function(req, res) {
+	    // alert('alskdf');
+	    // res.render('index', { user: req.user });
+	    res.redirect('/');
+	  });
+
+	app.get('/login', function(req, res){ // this is for failed login
+	  res.render('test', { user: req.user });
+	});
+
+	app.get('/loggedin', function(req, res) {
+	  console.log('In /loggedin - user is:');
+	  console.log(req.user);
+	  res.send(req.isAuthenticated() ? req.user : '0');
 	});
 
 	// Twitter test
