@@ -13,9 +13,9 @@ angular.module('angyeoApp')
       $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
       });
       //RSS Feed
-      $http.get('/rss').success(function(feedData){
-        $scope.rssData = feedData;
-      });
+      // $http.get('/rss').success(function(feedData){
+      //   $scope.rssData = feedData;
+      // });
       
       if ($scope.user.following){
         for (var key in $scope.user.following) {

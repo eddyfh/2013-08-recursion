@@ -42,3 +42,10 @@ Pando
 http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss
 TC
 http://techcrunch.com/rssfeeds/
+
+1) function to pull down rss data
+2) repeat every x minutes - 2 or 5
+3) check for repeats from previous - if repeat, discare
+4) for remaining, check against our list of companies to follow
+5) if match, save it to db w/ company tags
+6) email user, and create custom output

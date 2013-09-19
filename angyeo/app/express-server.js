@@ -7,7 +7,8 @@ var express = require('express'),
     port = 8000,
     config = module.exports.config = require('./config/config')[env],
     apikey = module.exports.apikey = 'a72hgev95qzstgam5aukbeqe',
-    fb = require('./config/passport')(app);
+    fb = require('./config/passport')(app)
+    rss = require('./rsstest');
 
 server.listen(port);
 
@@ -40,6 +41,9 @@ var db = require('./scripts/db');
 
 // Routes
 require('./scripts/routes')(app, config);
+setInterval(function(){
+  rss(app);
+},10000);
 // require('./rsstest')(app); // clean this up
 console.log('Express server listening on port '+port);
 

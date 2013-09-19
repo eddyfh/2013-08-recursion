@@ -16,4 +16,14 @@ var userSchema = mongoose.Schema({
 });
 var User = module.exports.User = mongoose.model('User', userSchema);
 
+var postSchema = mongoose.Schema({
+  title: 'string',
+  summary: 'string',
+  description: 'string',
+  url: 'string',
+  imageUrl: 'string',
+  imageTitle: 'string',
+  companies: 'array'
+});
 
+var Post = module.exports.Post = mongoose.model('Post', postSchema);
