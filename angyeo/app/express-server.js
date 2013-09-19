@@ -43,8 +43,7 @@ var db = require('./scripts/db');
 require('./scripts/routes')(app, config);
 setInterval(function(){
   rss(app);
-},10000);
-// require('./rsstest')(app); // clean this up
+},120000); // runs every 2 minutes
 console.log('Express server listening on port '+port);
 
 

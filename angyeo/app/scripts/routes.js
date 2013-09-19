@@ -7,21 +7,21 @@ var passport = require('passport');
 // var rss = require('../rsstest'); // this file should be moved
 
 module.exports = function(app, config){
-  app.post('/newacct', function(req, res, next){
-    console.dir(req.body.password);
-    db.addUser(config, req.body.username, req.body.password);
-    // console.log(req);
-    // console.log(res);
-    res.render('test', {user: req.user});
-  });
+  // app.post('/newacct', function(req, res, next){
+  //   console.dir(req.body.password);
+  //   db.addUser(config, req.body.username, req.body.password);
+  //   // console.log(req);
+  //   // console.log(res);
+  //   res.render('test', {user: req.user});
+  // });
 
   app.get('/', function(req, res){
 	  res.render('index', { user: req.user });
 	});
 
-	app.get('/asdf', function(req, res){
-	  res.render('test', { tester: true});
-	});
+	// app.get('/asdf', function(req, res){
+	//   res.render('test', { tester: true});
+	// });
 
 	app.post('/logout', function(req, res){
 		req.logOut();

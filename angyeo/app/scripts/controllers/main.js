@@ -37,7 +37,7 @@ angular.module('angyeoApp')
     });
 
 
-    $scope.checkPosts = function(name){
+    // $scope.checkPosts = function(name){
     //   $http({
     //   method: 'JSONP',
     //   url: 'http://api.crunchbase.com/v/1/companies/posts?name=Google&api_key=a72hgev95qzstgam5aukbeqe&callback=JSON_CALLBACK'
@@ -47,7 +47,7 @@ angular.module('angyeoApp')
     //   console.log(data);
     //     console.log('ERROR!');
     //   });
-    };
+    // };
 
     $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
       // $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
@@ -58,8 +58,8 @@ angular.module('angyeoApp')
       method: 'JSONP',
       url: 'http://api.crunchbase.com/v/1/company/'+query+'.js?api_key=a72hgev95qzstgam5aukbeqe&callback=JSON_CALLBACK'
     }).success(function(data){
-        console.log(data);
-        data.posts = $scope.checkPosts(data.name);
+        // console.log(data);
+        // data.posts = $scope.checkPosts(data.name);
         $scope.queries.push(data);
     }).error(function(data, status){
         console.log('ERROR!');
@@ -80,18 +80,18 @@ angular.module('angyeoApp')
       return user;
     };
     
-    $scope.twitterStream = function(){
-    };
+    // $scope.twitterStream = function(){
+    // };
     
-  }])
-  .controller('TestCtrl', ['$scope', '$http', function($scope, $http){
-    $scope.testthing = function(input){
-      console.log(input);
-      return input;
-    };
-    $scope.showfunc = function(){
-      return false;
-    };
+  // }])
+  // .controller('TestCtrl', ['$scope', '$http', function($scope, $http){
+  //   $scope.testthing = function(input){
+  //     console.log(input);
+  //     return input;
+  //   };
+  //   $scope.showfunc = function(){
+  //     return false;
+  //   };
   // }])
   // .factory('UserService', [function(){
   //   var userObj = {
