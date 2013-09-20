@@ -39,9 +39,13 @@
   </div>
 
   <div>RSS Feed
-    <ul ng-repeat='item in rssData'>
-      <li>{{item.title}}</li>
-    </div>
+    <input type = 'submit' value = 'Show RSS' ng-click='showRSS()'/>
+    <ul ng-repeat='post in rssData'>
+      <li ng-click='postClick()'><b>{{post.title+':'}}</b></li>
+      <li>Description:</li>
+      <li ng-bind-html-unsafe='post.description' ng-show='showDescription'></li>
+      <li>{{post.pubdate}}</li>
+    </ul>
   </div>
 </div>
 

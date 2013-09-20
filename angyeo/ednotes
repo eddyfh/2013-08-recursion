@@ -42,8 +42,13 @@ Pando
 http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss
 TC
 http://techcrunch.com/rssfeeds/
+http://feeds.feedburner.com/techcrunch/fundings-exits?format=xml
 
 1) function to pull down rss data
+make rss request for each rss feed one at a time
+- for now, don't worry about dupes across RSS feeds
+- for each one, do check vs last time, save to db, send email
+
 2) repeat every x minutes - 2 or 5
 3) check for repeats from previous - if repeat, discare
 4) for remaining, check against our list of companies to follow

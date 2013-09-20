@@ -8,7 +8,7 @@ var express = require('express'),
     config = module.exports.config = require('./config/config')[env],
     apikey = module.exports.apikey = 'a72hgev95qzstgam5aukbeqe',
     fb = require('./config/passport')(app)
-    rss = require('./rsstest');
+    rss = require('./scripts/rss');
 
 server.listen(port);
 
@@ -42,8 +42,16 @@ var db = require('./scripts/db');
 // Routes
 require('./scripts/routes')(app, config);
 setInterval(function(){
-  rss(app);
-},120000); // runs every 2 minutes
+  rss(app, 'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss'); // make this vary 
+},5000); // should run every 2 minutes
+// io.sockets.on('connection', function (socket) {
+//         twit.stream('statuses/filter', {track: companies}, function(stream) {
+//           stream.on('data', function (data) {
+//             socket.emit('twitter', data);
+//           });
+//         });
+//       });
+
 console.log('Express server listening on port '+port);
 
 

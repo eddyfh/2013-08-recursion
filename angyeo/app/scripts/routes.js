@@ -1,5 +1,6 @@
 var db = require('./db');
 var User = db.User;
+var Post = db.Post;
 var twitter = require('./twitter');
 var request = require('request');
 var apikey = require('../express-server').apikey;
@@ -17,6 +18,14 @@ module.exports = function(app, config){
 
   app.get('/', function(req, res){
 	  res.render('index', { user: req.user });
+	});
+
+	app.get('/rss', function(req, res){
+		console.log('in /rss');
+		Post.find(function(err, docs){
+			console.log(docs.pubdate);
+			res.send(docs);
+		});
 	});
 
 	// app.get('/asdf', function(req, res){

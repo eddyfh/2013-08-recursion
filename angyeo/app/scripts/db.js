@@ -17,14 +17,29 @@ var userSchema = mongoose.Schema({
 var User = module.exports.User = mongoose.model('User', userSchema);
 
 var postSchema = mongoose.Schema({
-  source: 'string',
+  //source: 'string',
   title: 'string',
   summary: 'string',
   description: 'string',
   url: 'string',
   imageUrl: 'string',
   imageTitle: 'string',
+  pubdate: 'date',
   companies: 'array'
 });
 
 var Post = module.exports.Post = mongoose.model('Post', postSchema);
+
+var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, companies){
+  var newPost = new Post({
+    title: title,
+    summary: summary,
+    description: description,
+    url: url,
+    imageUrl: imageUrl,
+    imageTitle: imageTitle,
+    pubdate: pubdate,
+    companies: companies
+  });
+  newPost.save();
+};

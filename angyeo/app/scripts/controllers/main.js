@@ -7,6 +7,7 @@ angular.module('angyeoApp')
     $scope.queried = false;
     $scope.tweets = [];
     $scope.user;
+    $scope.showDescription = false;
     // Retrieves logged in user's data and saves to $scope.user
     $http.get('/loggedin').success(function(user){
       $scope.user = user;
@@ -35,6 +36,26 @@ angular.module('angyeoApp')
       $scope.$apply();
       // socket.emit('my other event', { my: 'data' });
     });
+    
+    $scope.showRSS = function(){
+      $http.get('/rss').success(function(data){
+        console.log('running ShowRSS');
+        $scope.rssData = data;
+      });
+    };
+    $scope.postClick = function(){
+      if ($scope.showDescription === false){
+        $scope.showDescription = true;
+      } else {
+        $scope.showDescription = false;
+      }
+    };
+    // RSS TEST
+    // socket.on('rssFeed', function(data){
+    //   $scope.rssData = data;
+    //   $scope.$apply();
+    // });
+
 
 
     // $scope.checkPosts = function(name){
