@@ -43,7 +43,7 @@ var db = require('./scripts/db');
 require('./scripts/routes')(app, config);
 setInterval(function(){
   rss(app, 'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss'); // make this vary 
-},5000); // should run every 2 minutes
+}, 3000); // should run every 2 minutes
 // io.sockets.on('connection', function (socket) {
 //         twit.stream('statuses/filter', {track: companies}, function(stream) {
 //           stream.on('data', function (data) {

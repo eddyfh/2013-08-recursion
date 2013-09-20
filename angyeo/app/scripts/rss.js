@@ -3,9 +3,19 @@
 var FeedParser = require('feedparser'),
     request = require('request'),
     db = require('./db');
-    lastFeed = [];
+    // lastFeed = [];
 
 module.exports = function(app, feedUrl){
+  var lastFeed;
+  db.getLastPost(feedUrl, function(data){
+    if (data[0]){
+      lastFeed = data[0].posts;
+    } else {
+      lastFeed = [];
+    }
+    console.log('lastfeed is ');
+    console.dir(lastFeed);
+  });
   // app.get('/rss', function(req, res){
   var feed = [];
   io = app.io;
@@ -42,12 +52,18 @@ module.exports = function(app, feedUrl){
     // console.dir(feed);
     })
     .on('end', function(){
-      var temp = feed;
+      // console.log(feed);
+      console.log('should be saving');
+      var feedTitles=[];
+      for (var i = 0; i < feed.length; i++){
+        feedTitles.push(feed[i]['title']);
+      };
+      db.saveLastPost(feedUrl, feedTitles);
       var feedAdditions=[];
       var duplicate = false;
       for (var i = 0; i < feed.length; i++){
         for (var j = 0; j < lastFeed.length; j++){
-          if (feed[i]['title'] === lastFeed[j]['title']){
+          if (feed[i]['title'] === lastFeed[j]){
             duplicate = true;
           }
         }
@@ -56,7 +72,7 @@ module.exports = function(app, feedUrl){
         }
         duplicate = false;
       }
-      console.log('======= NEW FEED ADDITIONS =========');
+      // console.log('======= NEW FEED ADDITIONS =========');
       for (var i = 0; i < feedAdditions.length; i++){
         db.savePost(
           feedAdditions[i].title, 
@@ -70,11 +86,10 @@ module.exports = function(app, feedUrl){
           );
       };
       
-      // Prints out companies being added
-      for (var i = 0; i < feedAdditions.length; i++){
-        console.log(feedAdditions[i]['title']);
-      }
-      lastFeed = temp;
+      // Print out companies being added
+      // for (var i = 0; i < feedAdditions.length; i++){
+        // console.log(feedAdditions[i]['title']);
+      // }
     });
   // });
 };
