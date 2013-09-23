@@ -5,7 +5,14 @@ var FeedParser = require('feedparser'),
     db = require('./db');
     // lastFeed = [];
 
-module.exports = function(app, feedUrl){
+var rssFeeds = module.exports.rssFeeds = [
+'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss',
+'http://www.techmeme.com/feed.xml',
+'http://feeds.feedburner.com/techcrunch/?format=xml',
+'http://allthingsd.com/category/news/feed/'
+];
+
+module.exports.getFeed = function(app, feedUrl){
   var lastFeed;
   db.getLastPost(feedUrl, function(data){
     if (data[0]){
@@ -13,8 +20,8 @@ module.exports = function(app, feedUrl){
     } else {
       lastFeed = [];
     }
-    console.log('lastfeed is ');
-    console.dir(lastFeed);
+    // console.log('lastfeed is ');
+    // console.dir(lastFeed);
   });
   // app.get('/rss', function(req, res){
   var feed = [];
@@ -30,7 +37,6 @@ module.exports = function(app, feedUrl){
       // console.log('===== %s =====', meta.title);
     })
     .on('readable', function (data) {
-      // do something else, then do the next thing
       var stream = this, item;
       while (item = stream.read()) {
         // console.log('Got article: ', item.title || item.description);
@@ -40,20 +46,17 @@ module.exports = function(app, feedUrl){
           description: item.description,
           url: item.link,
           image: item.image,
-          pubdate: item.pubdate
-          // imageUrl: 'string',
-          // imageTitle: 'string',
-          // companies: 'array'
+          pubdate: item.pubdate,
+          source: item.source
         });
       }
 
       // console.log('feed data is ');
     // res.send();
-    // console.dir(feed);
+    // console.dir(feed[1]);
     })
     .on('end', function(){
-      // console.log(feed);
-      console.log('should be saving');
+      // console.log('should be saving');
       var feedTitles=[];
       for (var i = 0; i < feed.length; i++){
         feedTitles.push(feed[i]['title']);
@@ -61,6 +64,7 @@ module.exports = function(app, feedUrl){
       db.saveLastPost(feedUrl, feedTitles);
       var feedAdditions=[];
       var duplicate = false;
+      // Loop checks for duplicates vs. the last time
       for (var i = 0; i < feed.length; i++){
         for (var j = 0; j < lastFeed.length; j++){
           if (feed[i]['title'] === lastFeed[j]){
@@ -72,8 +76,14 @@ module.exports = function(app, feedUrl){
         }
         duplicate = false;
       }
-      // console.log('======= NEW FEED ADDITIONS =========');
+      console.log('======= NEW FEED ADDITIONS =========');
       for (var i = 0; i < feedAdditions.length; i++){
+        console.log(feedAdditions[i]['title']);
+        // console.log(feed[i]['title']);
+        // console.log(lastFeed[i]['title'])
+      }
+      for (var i = 0; i < feedAdditions.length; i++){
+        // Make sure this matches the savePost arguments required
         db.savePost(
           feedAdditions[i].title, 
           feedAdditions[i].summary, 
@@ -82,14 +92,12 @@ module.exports = function(app, feedUrl){
           feedAdditions[i].image.url, 
           feedAdditions[i].image.title,
           feedAdditions[i].pubdate, 
-          'testcos'  
+          feedAdditions[i].source,
+          db.checkCompanyList(feedAdditions[i].title)
           );
       };
       
       // Print out companies being added
-      // for (var i = 0; i < feedAdditions.length; i++){
-        // console.log(feedAdditions[i]['title']);
-      // }
     });
   // });
 };

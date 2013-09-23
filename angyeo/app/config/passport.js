@@ -29,7 +29,7 @@ module.exports = function(app) {
 	  },
 	  function(accessToken, refreshToken, profile, done) {
 	    User.findOne({ userId: profile.id}, function(err, user) {
-	      // console.log(profile);
+	      console.log(profile);
 	      // console.log('------------------');
 	      if (err) { return done(err);}
 	      if (!user) {

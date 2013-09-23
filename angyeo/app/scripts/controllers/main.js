@@ -13,6 +13,7 @@ angular.module('angyeoApp')
       $scope.user = user;
       $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
       });
+      $scope.showRSS();
       //RSS Feed
       // $http.get('/rss').success(function(feedData){
       //   $scope.rssData = feedData;
@@ -38,8 +39,8 @@ angular.module('angyeoApp')
     });
     
     $scope.showRSS = function(){
-      $http.get('/rss').success(function(data){
-        console.log('running ShowRSS');
+      $http({method: 'GET', url: '/rss', params: [$scope.user]}).success(function(data){
+        // console.log('running ShowRSS');
         $scope.rssData = data;
       });
     };
@@ -49,6 +50,11 @@ angular.module('angyeoApp')
       } else {
         $scope.showDescription = false;
       }
+    };
+    $scope.saveEmail = function(email){
+      $http({method: 'POST', url: '/emailsubmit', params: [email, $scope.user]}).success(function(){
+        console.log('successfully posted');
+      });
     };
     // RSS TEST
     // socket.on('rssFeed', function(data){

@@ -7,7 +7,7 @@ var express = require('express'),
     port = 8000,
     config = module.exports.config = require('./config/config')[env],
     apikey = module.exports.apikey = 'a72hgev95qzstgam5aukbeqe',
-    fb = require('./config/passport')(app)
+    fb = require('./config/passport')(app),
     rss = require('./scripts/rss');
 
 server.listen(port);
@@ -42,8 +42,10 @@ var db = require('./scripts/db');
 // Routes
 require('./scripts/routes')(app, config);
 setInterval(function(){
-  rss(app, 'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss'); // make this vary 
-}, 3000); // should run every 2 minutes
+  for (var i = 0; i < rss.rssFeeds.length; i++){
+    rss.getFeed(app, rss.rssFeeds[i]); 
+  }
+  }, 60000); // should run every 2 minutes (every minute currently)
 // io.sockets.on('connection', function (socket) {
 //         twit.stream('statuses/filter', {track: companies}, function(stream) {
 //           stream.on('data', function (data) {
@@ -52,6 +54,9 @@ setInterval(function(){
 //         });
 //       });
 
+// db.createCompanyList(); // DON'T RUN EVERY TIME
+db.saveLocalCompanyList(); // Saves list in db to local variable
+// console.log('results is ', db.checkCompanyList('VMware'));
 console.log('Express server listening on port '+port);
 
 

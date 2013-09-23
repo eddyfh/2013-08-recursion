@@ -1,5 +1,9 @@
 var mongoose = require('mongoose'),
     config = require('../express-server').config;
+var fs = require('fs');
+var path = require('path');
+var loadedCompanyList = {}; // load the company list into an object; this object looks like 
+//{companyname: crunchbaseURL}
 
 // module.exports.addUser = function(config, profile){
 //   var newuser = new User({username: profile.username, displayname: profile.displayName});
@@ -11,6 +15,7 @@ var userSchema = mongoose.Schema({
   userId: 'number',
   username: 'string',
   displayname: 'string',
+  email: 'string',
   queried: 'mixed',
   following: 'mixed'
 });
@@ -25,12 +30,13 @@ var postSchema = mongoose.Schema({
   imageUrl: 'string',
   imageTitle: 'string',
   pubdate: 'date',
+  source: 'string',
   companies: 'array'
 });
 
 var Post = module.exports.Post = mongoose.model('Post', postSchema);
 
-var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, companies){
+var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, source, companies){
   var newPost = new Post({
     title: title,
     summary: summary,
@@ -39,6 +45,7 @@ var savePost = module.exports.savePost = function(title, summary, description, u
     imageUrl: imageUrl,
     imageTitle: imageTitle,
     pubdate: pubdate,
+    source: source,
     companies: companies
   });
   newPost.save();
@@ -63,6 +70,77 @@ var getLastPost = module.exports.getLastPost = function(feedUrl, callback){
   });
 };
 
+var companySchema = mongoose.Schema({
+  name: 'string',
+  crunchUrl: 'string'
+});
+
+var Company = mongoose.model('Company', companySchema);
+
+var saveCompany = function(company, crunchUrl){
+  var newCompany = new Company({
+    name: company,
+    crunchUrl: crunchUrl
+  });
+  newCompany.save();
+};
+
+// May want to clean out 'inc', 'inc.', etc from here
+var readList = function(filePath, cb){
+  fs.readFile(filePath, 'utf8', function(err, data) {   // need utf8 so garbage isn't returned
+    data = data.split('\r\n');
+    for (var i = 0; i < data.length; i++){
+      data[i] = data[i].split(',');
+    }
+    cb(data);
+  });
+};
+// Clears out db, then creates all new list
+var createCompanyList = module.exports.createCompanyList = function(){
+  Company.find().remove();
+  readList(path.join(__dirname,'../data/companylist.csv'), function(data){
+    for (var i = 0; i < data.length; i++){
+      saveCompany(data[i][1], data[i][0]);
+    }
+  });
+};
+
+// Could try to use regex to find matches, but prob easier to convert everything to lcase
+// Fn takes an article title, checks for any company matches, returns array of matches
+var checkCompanyList = module.exports.checkCompanyList = function(title){
+  var results = [];
+  titleWords = title.toLowerCase().split(' ');
+  // console.log(titleWords);
+  for (var i = 0; i < titleWords.length; i++){
+    if (loadedCompanyList[titleWords[i]]){
+      results.push(titleWords[i]);
+    }
+  }
+  // check for 2- and 3-word company names
+  for (var i = 0; i < titleWords.length - 1; i++){
+    if (loadedCompanyList[titleWords[i]+' '+titleWords[i+1]]){
+      results.push(titleWords[i]+' '+titleWords[i+1]);
+    }
+  }
+  for (var i = 0; i < titleWords.length - 2; i++){
+    if (loadedCompanyList[titleWords[i]+' '+titleWords[i+1] + ' ' + titleWords[i+2]]){
+      results.push(titleWords[i]+' '+titleWords[i+1]+' '+titleWords[i+2]);
+    }
+  }
+  if (results.length<1){
+    return null;
+  } else {
+    return results;
+  }
+};
+
+var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
+  Company.find().exec(function(err, docs){
+    for (var i = 0; i < docs.length; i++){
+      loadedCompanyList[docs[i].name.toLowerCase()] = docs[i].crunchUrl;
+    }
+  });
+};
 
 //   LastPost.find({feedUrl: feedUrl}, function(err, docs){
 //     if (docs[0]){

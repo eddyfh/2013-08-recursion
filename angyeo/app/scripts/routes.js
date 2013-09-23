@@ -20,10 +20,17 @@ module.exports = function(app, config){
 	  res.render('index', { user: req.user });
 	});
 
+// Get user's followed companies, find posts mentioning these companies
 	app.get('/rss', function(req, res){
-		console.log('in /rss');
-		Post.find(function(err, docs){
-			console.log(docs.pubdate);
+		var User = JSON.parse(req.query[0]);
+		var companiesArray=[];
+		for (var key in User.following){
+			companiesArray.push(key.toLowerCase());
+		}
+		console.dir(companiesArray);
+		// var start = new Date(2013, 8, 20);
+		// var end = new Date(2013, 8, 21);
+		Post.find({companies: {$in: companiesArray}}).sort('-pubdate').limit(20).exec(function(err, docs){
 			res.send(docs);
 		});
 	});
@@ -113,6 +120,16 @@ module.exports = function(app, config){
 	  console.log('In /loggedin - user is:');
 	  console.log(req.user);
 	  res.send(req.isAuthenticated() ? req.user : '0');
+	});
+
+	app.post('/emailsubmit', function(req, res){
+		console.log('in emailsubmit');
+    var emailNew = (req.query[0]);
+		var userid = JSON.parse(req.query[1])['_id'];
+		User.findById(userid, function(err,docs){
+			docs.email = emailNew;
+			docs.save();
+		});
 	});
 
 	// Twitter test
