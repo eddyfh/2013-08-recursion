@@ -8,6 +8,16 @@ angular.module('angyeoApp')
     $scope.tweets = [];
     $scope.user;
     $scope.showDescription = false;
+    $scope.showFollowing = false;
+    $scope.companyList=[];
+    // Save the company list into scope
+    $http.get('/getCompanyList').success(function(data){
+      console.log('got company list');
+      console.log(data);
+      for (var key in data){
+        $scope.companyList.push(key);
+      }
+    });
     // Retrieves logged in user's data and saves to $scope.user
     $http.get('/loggedin').success(function(user){
       $scope.user = user;
@@ -40,7 +50,7 @@ angular.module('angyeoApp')
     
     $scope.showRSS = function(){
       $http({method: 'GET', url: '/rss', params: [$scope.user]}).success(function(data){
-        // console.log('running ShowRSS');
+        console.log('running ShowRSS');
         $scope.rssData = data;
       });
     };
@@ -56,6 +66,16 @@ angular.module('angyeoApp')
         console.log('successfully posted');
       });
     };
+    $scope.showFollowingToggle = function(){
+      $scope.showFollowing = !$scope.showFollowing;
+    };
+    $scope.selectedCo = undefined;
+    // $scope.tempTest = function(){
+    //   $http.get('/testtest').success(function(data){
+    //     console.log(data);
+    //     $scope.tempTestData = data;
+    //   });
+    // };
     // RSS TEST
     // socket.on('rssFeed', function(data){
     //   $scope.rssData = data;

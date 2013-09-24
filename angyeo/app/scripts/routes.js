@@ -23,14 +23,18 @@ module.exports = function(app, config){
 // Get user's followed companies, find posts mentioning these companies
 	app.get('/rss', function(req, res){
 		var User = JSON.parse(req.query[0]);
+		console.log('User:',User);
 		var companiesArray=[];
 		for (var key in User.following){
+			console.dir(key);
 			companiesArray.push(key.toLowerCase());
 		}
-		console.dir(companiesArray);
+		console.log('companiesArray:', companiesArray);
+		// companiesArray = ['google', 'linkedin'];
 		// var start = new Date(2013, 8, 20);
 		// var end = new Date(2013, 8, 21);
 		Post.find({companies: {$in: companiesArray}}).sort('-pubdate').limit(20).exec(function(err, docs){
+			console.log(docs);
 			res.send(docs);
 		});
 	});
@@ -131,6 +135,19 @@ module.exports = function(app, config){
 			docs.save();
 		});
 	});
+
+app.get('/getCompanyList', function(req, res){
+	console.log('in getcompanylist');
+	console.log(db.loadedCompanyList);
+	res.send(db.loadedCompanyList);
+});
+
+//Delete below
+// var rss = require('./rss');
+// app.get('/testtest',function(req,res){
+// 	console.log('in get /testtest');
+// 	res.send(rss.temptest);
+// });
 
 	// Twitter test
 	// app.get('/api/twitter', function(req,res){ 

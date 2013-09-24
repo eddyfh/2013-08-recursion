@@ -45,7 +45,7 @@ setInterval(function(){
   for (var i = 0; i < rss.rssFeeds.length; i++){
     rss.getFeed(app, rss.rssFeeds[i]); 
   }
-  }, 60000); // should run every 2 minutes (every minute currently)
+  }, 10000); // should run every 2 minutes (every minute currently)
 // io.sockets.on('connection', function (socket) {
 //         twit.stream('statuses/filter', {track: companies}, function(stream) {
 //           stream.on('data', function (data) {
@@ -53,6 +53,7 @@ setInterval(function(){
 //           });
 //         });
 //       });
+
 
 // db.createCompanyList(); // DON'T RUN EVERY TIME
 db.saveLocalCompanyList(); // Saves list in db to local variable

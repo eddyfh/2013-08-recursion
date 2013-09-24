@@ -2,8 +2,8 @@ var mongoose = require('mongoose'),
     config = require('../express-server').config;
 var fs = require('fs');
 var path = require('path');
-var loadedCompanyList = {}; // load the company list into an object; this object looks like 
-//{companyname: crunchbaseURL}
+var loadedCompanyList = module.exports.loadedCompanyList = {}; // load the company list into an object; this object looks like 
+//{companyname: crunchbaseURL}  - probably should not be saved this way
 
 // module.exports.addUser = function(config, profile){
 //   var newuser = new User({username: profile.username, displayname: profile.displayName});
@@ -29,7 +29,7 @@ var postSchema = mongoose.Schema({
   url: 'string',
   imageUrl: 'string',
   imageTitle: 'string',
-  pubdate: 'date',
+  pubdate: 'string',
   source: 'string',
   companies: 'array'
 });
@@ -88,9 +88,11 @@ var saveCompany = function(company, crunchUrl){
 // May want to clean out 'inc', 'inc.', etc from here
 var readList = function(filePath, cb){
   fs.readFile(filePath, 'utf8', function(err, data) {   // need utf8 so garbage isn't returned
-    data = data.split('\r\n');
+    data = data.split('\n');
     for (var i = 0; i < data.length; i++){
       data[i] = data[i].split(',');
+      // data[i][0] = data[i][0].toLowerCase();
+      // data[i][1] = data[i][1].toLowerCase();
     }
     cb(data);
   });
@@ -99,9 +101,11 @@ var readList = function(filePath, cb){
 var createCompanyList = module.exports.createCompanyList = function(){
   Company.find().remove();
   readList(path.join(__dirname,'../data/companylist.csv'), function(data){
+    console.log(data);
     for (var i = 0; i < data.length; i++){
       saveCompany(data[i][1], data[i][0]);
     }
+    console.log('COMPANY MASTER LIST SAVED TO DB');
   });
 };
 
@@ -109,27 +113,33 @@ var createCompanyList = module.exports.createCompanyList = function(){
 // Fn takes an article title, checks for any company matches, returns array of matches
 var checkCompanyList = module.exports.checkCompanyList = function(title){
   var results = [];
+  var lcaseCompanyList=[];
+  for (var key in loadedCompanyList){
+    lcaseCompanyList.push(key.toLowerCase());
+  }
   titleWords = title.toLowerCase().split(' ');
   // console.log(titleWords);
   for (var i = 0; i < titleWords.length; i++){
-    if (loadedCompanyList[titleWords[i]]){
+    if (lcaseCompanyList[titleWords[i]]){
       results.push(titleWords[i]);
     }
   }
   // check for 2- and 3-word company names
   for (var i = 0; i < titleWords.length - 1; i++){
-    if (loadedCompanyList[titleWords[i]+' '+titleWords[i+1]]){
+    if (lcaseCompanyList[titleWords[i]+' '+titleWords[i+1]]){
       results.push(titleWords[i]+' '+titleWords[i+1]);
     }
   }
   for (var i = 0; i < titleWords.length - 2; i++){
-    if (loadedCompanyList[titleWords[i]+' '+titleWords[i+1] + ' ' + titleWords[i+2]]){
+    if (lcaseCompanyList[titleWords[i]+' '+titleWords[i+1] + ' ' + titleWords[i+2]]){
       results.push(titleWords[i]+' '+titleWords[i+1]+' '+titleWords[i+2]);
     }
   }
   if (results.length<1){
+    // console.log('none');
     return null;
   } else {
+    // console.log(results);
     return results;
   }
 };
@@ -137,7 +147,7 @@ var checkCompanyList = module.exports.checkCompanyList = function(title){
 var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
   Company.find().exec(function(err, docs){
     for (var i = 0; i < docs.length; i++){
-      loadedCompanyList[docs[i].name.toLowerCase()] = docs[i].crunchUrl;
+      loadedCompanyList[docs[i].name] = docs[i].crunchUrl;
     }
   });
 };

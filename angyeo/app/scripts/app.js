@@ -1,6 +1,6 @@
 'use strict';
 
-var crunchlApp = angular.module('angyeoApp', [])
+var crunchlApp = angular.module('angyeoApp', ['ui.bootstrap'])
   .config(function ($routeProvider, $locationProvider, $httpProvider) {
     var checkLoggedin = function($q, $timeout, $http, $location, $rootScope){
       // Initialize a new promise

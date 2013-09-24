@@ -2,8 +2,8 @@
 
 var FeedParser = require('feedparser'),
     request = require('request'),
-    db = require('./db');
-    // lastFeed = [];
+    db = require('./db'),
+    moment = require('moment');
 
 var rssFeeds = module.exports.rssFeeds = [
 'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss',
@@ -39,10 +39,11 @@ module.exports.getFeed = function(app, feedUrl){
     .on('readable', function (data) {
       var stream = this, item;
       while (item = stream.read()) {
+        // console.log(moment(item.pubdate).format("MM-DD-YYYY"));
         // console.log('Got article: ', item.title || item.description);
         feed.push({
           title: item.title,
-          summary: item.summary,
+          summary: item,
           description: item.description,
           url: item.link,
           image: item.image,
@@ -77,11 +78,11 @@ module.exports.getFeed = function(app, feedUrl){
         duplicate = false;
       }
       console.log('======= NEW FEED ADDITIONS =========');
-      for (var i = 0; i < feedAdditions.length; i++){
-        console.log(feedAdditions[i]['title']);
+      // for (var i = 0; i < feedAdditions.length; i++){
+        // console.log(feedAdditions[i]['title']);
         // console.log(feed[i]['title']);
         // console.log(lastFeed[i]['title'])
-      }
+      // }
       for (var i = 0; i < feedAdditions.length; i++){
         // Make sure this matches the savePost arguments required
         db.savePost(
@@ -91,7 +92,7 @@ module.exports.getFeed = function(app, feedUrl){
           feedAdditions[i].link, 
           feedAdditions[i].image.url, 
           feedAdditions[i].image.title,
-          feedAdditions[i].pubdate, 
+          moment(feedAdditions[i].pubdate).format("MMMM Do YYYY h:mm a"), 
           feedAdditions[i].source,
           db.checkCompanyList(feedAdditions[i].title)
           );
