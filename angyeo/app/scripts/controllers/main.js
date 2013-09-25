@@ -1,5 +1,5 @@
 'use strict';
-
+FIX SO THAT ONLY ADDS COMPANIES IN ONE PLACE
 angular.module('angyeoApp')
   .controller('MainCtrl', ['$scope', '$http', '$modal', function ($scope, $http, $modal) {
     $scope.query = false;
@@ -10,11 +10,8 @@ angular.module('angyeoApp')
     $scope.showDescription = false;
     $scope.showFollowing = false;
     $scope.companyList=[];
-    // $scope.testbuttonresult = 'nothing at first';
-    // $scope.testbutton = function() {
-    //   $scope.testbuttonresult = 'YOYOYO';
-    // };
     // Save the company list into scope
+    // TURN THIS INTO A SERVICE
     $http.get('/getCompanyList').success(function(data){
       // console.log('got company list');
       // console.log(data);
@@ -40,42 +37,18 @@ angular.module('angyeoApp')
       }
     });
 
-    // Modal
-    $scope.initialCos = ['co1', 'co2', 'co3'];
-    $scope.newsSources = ['source1', 'srouce2', 'source3'];
-    // $scope.items = ['item1', 'item2', 'item3'];
-
-  // $scope.open = function () {
-
-  //   var modalInstance = $modal.open({
-  //     templateUrl: 'myModalContent.html',
-  //     controller: ModalInstanceCtrl,
-  //     resolve: {
-  //       items: function () {
-  //         return $scope.items;
-  //       }
-  //     }
-  //   });
-
-  //   modalInstance.result.then(function (selectedItem) {
-  //     $scope.selected = selectedItem;
-  //   }, function () {
-  //     // $log.info('Modal dismissed at: ' + new Date());
-  //   });
-  // };
-
     $scope.logout = function(){
       $http.post('/logout');
     };
 
     // TWITTERSTREAM - this only works for 1 user right now
-    var socket = io.connect('http://localhost');
-    socket.on('twitter', function (data) {
-      $scope.tweets = data;
-      $scope.$apply();
-      // socket.emit('my other event', { my: 'data' });
-    });
-    
+    // var socket = io.connect('http://localhost');
+    // socket.on('twitter', function (data) {
+    //   $scope.tweets = data;
+    //   $scope.$apply();
+    //   // socket.emit('my other event', { my: 'data' });
+    // });
+
     $scope.showRSS = function(){
       $http({method: 'GET', url: '/rss', params: [$scope.user]}).success(function(data){
         console.log('running ShowRSS');
@@ -98,31 +71,11 @@ angular.module('angyeoApp')
       $scope.showFollowing = !$scope.showFollowing;
     };
     $scope.selectedCo = undefined;
-    // $scope.tempTest = function(){
-    //   $http.get('/testtest').success(function(data){
-    //     console.log(data);
-    //     $scope.tempTestData = data;
-    //   });
-    // };
     // RSS TEST
     // socket.on('rssFeed', function(data){
     //   $scope.rssData = data;
     //   $scope.$apply();
     // });
-
-
-
-    // $scope.checkPosts = function(name){
-    //   $http({
-    //   method: 'JSONP',
-    //   url: 'http://api.crunchbase.com/v/1/companies/posts?name=Google&api_key=a72hgev95qzstgam5aukbeqe&callback=JSON_CALLBACK'
-    // }).success(function(data){
-    //     console.log(data);
-    // }).error(function(data, status){
-    //   console.log(data);
-    //     console.log('ERROR!');
-    //   });
-    // };
 
     $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
       // $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
@@ -150,8 +103,17 @@ angular.module('angyeoApp')
       return user;
     };
 }])
-.controller('ModalDemoCtrl', ['$scope', '$modal', function($scope, $modal){
+.controller('ModalDemoCtrl', ['$scope', '$http', '$modal', function($scope, $http, $modal){
   $scope.items = ['item1', 'item2', 'item3'];
+  
+  $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
+      $http({method: 'GET', url: '/api/crunchbase/profile', params: [query]}).success(function(data){
+        $scope.query = data;
+    }).error(function(data, status){
+        console.log('ERROR!');
+      });
+
+    };
 
   $scope.open = function () {
     console.log('SCOPE OPEN CALLED');
@@ -171,17 +133,48 @@ angular.module('angyeoApp')
       // $log.info('Modal dismissed at: ' + new Date());
     });
   };
-
 }])
-.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', 'items', function ($scope, $modalInstance, items) {
-  $scope.items = items;
+.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', '$http', 'items', function ($scope, $modalInstance, $http, items) {
+  $scope.items = items; // delete this
+  $scope.companyList = [];
+  $scope.follow = [];
+  $scope.user;
+  $http.get('/loggedin').success(function(user){
+      $scope.user = user;
+    });
+  $scope.tempSave = function(company){
+    $scope.follow.push(company);
+    console.log($scope.follow);
+  };
+  $scope.ok = function(){
+      $http({method: 'POST', url: '/followPost', params: [$scope.follow, $scope.user.userId]}).success(function(){
+        console.log('added to DB');
+        $modalInstance.close($scope.selected.item);
+      });
+    };
+  $scope.removeTemp = function(company){
+    console.log('removeTemp');
+    for (var i = 0; i < $scope.follow.length; i++){
+      if ($scope.follow[i] === company){
+        $scope.follow.splice(i,1);
+      }
+    }
+    console.log($scope.follow);
+  };
+  $http.get('/getCompanyList').success(function(data){
+      console.log('got company list');
+      // console.log(data);
+      for (var key in data){
+        $scope.companyList.push(key);
+      }
+    });
   $scope.selected = {
     item: $scope.items[0]
   };
 
-  $scope.ok = function () {
-    $modalInstance.close($scope.selected.item);
-  };
+  // $scope.ok = function () {
+  //   $modalInstance.close($scope.selected.item);
+  // };
 
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
@@ -208,3 +201,15 @@ angular.module('angyeoApp')
   // .controller('NewCtrl', ['$scope', function($scope){}
   //   $scope.testData;
   // ]);
+
+    // $scope.checkPosts = function(name){
+    //   $http({
+    //   method: 'JSONP',
+    //   url: 'http://api.crunchbase.com/v/1/companies/posts?name=Google&api_key=a72hgev95qzstgam5aukbeqe&callback=JSON_CALLBACK'
+    // }).success(function(data){
+    //     console.log(data);
+    // }).error(function(data, status){
+    //   console.log(data);
+    //     console.log('ERROR!');
+    //   });
+    // };

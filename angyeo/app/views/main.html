@@ -1,4 +1,6 @@
 <div class = 'container'>
+
+<!-- should separate this-->
 <div ng-controller='ModalDemoCtrl'>
   <script type="text/ng-template" id="myModalContent.html">
   <div class='modal-dialog'>
@@ -6,10 +8,12 @@
   <div class='modal-header'>asdf</div>
     <div class="modal-body">
     Pick companies to follow (at least 2)
+    Add a company to follow: <!-- <input id='userQuery' ng-model='userSearch'/> -->
+      <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:8' | orderBy: 'company'/>
+      <input type='submit' value='Submit' ng-click='tempSave(selectedCo)'/>
+      <div>Your companies (click to remove):</div>
             <ul>
-                <li ng-repeat="item in items">
-                    <a ng-click="selected.item = item">{{ item }}</a>
-                </li>
+                <li  ng-repeat="company in follow" ng-click='removeTemp(company)'>{{company}}</li>
             </ul>
             Selected: <b>{{ selected.item }}</b>
         </div>

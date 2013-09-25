@@ -52,3 +52,13 @@ var crunchlApp = angular.module('angyeoApp', ['ui.bootstrap'])
       });
 
   });
+
+crunchlApp.factory('companyListService', function(){
+  var companyList=[];
+  $http.get('/getCompanyList').success(function(data){
+        for (var key in data){
+          companyList.push(key);
+        }
+        return companyList;
+      });
+});

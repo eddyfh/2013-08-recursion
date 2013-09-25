@@ -67,26 +67,38 @@ module.exports = function(app, config){
   //   res.send(results);
   // });
 
-// First retrieves existing companies, then adds new company to follow
+NEED TO FIX SO THAT ADDS COMPANIES CORRECTLY
+// First retrieves existing companies being followed, then adds new company to follow
   app.post('/followPost', function(req, res){
-    var companyName = req.query[0];
-    var reqUserId = req.query[1];
-    User.find({userId: reqUserId}, function(err, user){
-      var companiesFollowed = user[0]['following'] || {};
-      // Get # of posts from crunchbase for given company
-      request.get({
-        url: 'http://api.crunchbase.com/v/1/companies/posts?name='+companyName+'&api_key='+apikey,
-        json: true}, 
-      function(e,response, body){
-        companiesFollowed[companyName] = body['num_posts'];
-        var setvar = {$set: {}};
-        setvar.$set['following'] = companiesFollowed; // Need to do it this way to use update properly
-        User.update({userId: reqUserId}, setvar, function(){
-          // can do something here
+  	req.query[0] = JSON.parse(req.query[0]);
+  	console.dir(req.query[0]);
+    console.log('in followpost');
+    // if (typeof(req.query[0] === 'string')){
+    // 	console.log('string');
+    // 	console.dir(req.query[0]);
+    // } else if (Array.isArray(req.query[0])) {
+      console.log('in array');
+      console.log(req.query[0].length);
+      for (var i = 0; i < req.query[0].length; i++){
+		    var companyName = req.query[0];
+		    var reqUserId = req.query[1];
+		    User.find({userId: reqUserId}, function(err, user){
+		      var companiesFollowed = user[0]['following'] || {};
+		      // Get # of posts from crunchbase for given company
+		      request.get({
+		        url: 'http://api.crunchbase.com/v/1/companies/posts?name='+companyName+'&api_key='+apikey,
+		        json: true}, 
+		      function(e,response, body){
+		        companiesFollowed[companyName] = body['num_posts'];
+		        var setvar = {$set: {}};
+		        setvar.$set['following'] = companiesFollowed; // Need to do it this way to use update properly
+		        User.update({userId: reqUserId}, setvar, function(){
+		          // can do something here
         });
       });
-      
     });
+    // }
+  } // if statement
   });
 
   app.get('/startTwitter', function(req, res){
