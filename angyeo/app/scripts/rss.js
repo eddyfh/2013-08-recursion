@@ -39,6 +39,7 @@ module.exports.getFeed = function(app, feedUrl){
     .on('readable', function (data) {
       var stream = this, item;
       while (item = stream.read()) {
+        // console.log(item.categories);
         // console.log(moment(item.pubdate).format("MM-DD-YYYY"));
         // console.log('Got article: ', item.title || item.description);
         feed.push({

@@ -10,7 +10,8 @@
     "request":"2.27.0",
     "feedparser":"0.16.1",
     "moment":"2.2.1",
-    "ntwitter":"0.5.0"
+    "ntwitter":"0.5.0",
+    "ejs":"0.8.4"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

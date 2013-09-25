@@ -9,7 +9,8 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- old: http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap.min.css-->
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
         <!-- build:css(.tmp) styles/main.css -->
@@ -80,19 +81,20 @@
         <script src="scripts/controllers/main.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <!-- endbuild -->
+<!-- <div id='testid'></div> -->
 
-        <!-- DELETE THIS!!!
-          <script type="text/javascript">
-            $(function(){
-              $('#testid').append('<p>test</p>');
-              $.ajax({
-                type: 'GET',
-                dataType: 'jsonp',
-                url: 'http://api.crunchbase.com/v/1/company/orderahead.js?api_key=a72hgev95qzstgam5aukbeqe'
-              }).done(function(data){
-                  console.log(data);
-              });
-            });
-            </script>-->
+           <script type="text/javascript">
+          //   $(function(){
+          //     $('#testid').append('<p>test</p>');
+          //     $.ajax({
+          //       type: 'GET',
+          //       dataType: 'jsonp',
+          //       url: 'http://api.crunchbase.com/v/1/company/orderahead.js?api_key=a72hgev95qzstgam5aukbeqe'
+          //     }).done(function(data){
+          //         console.log(data);
+          //     });
+          //   });
+          //   </script>
+
 </body>
 </html>

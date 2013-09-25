@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('angyeoApp')
-  .controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
-    $scope.queries = [];
+  .controller('MainCtrl', ['$scope', '$http', '$modal', function ($scope, $http, $modal) {
+    $scope.query = false;
     $scope.follow = [];
     $scope.queried = false;
     $scope.tweets = [];
@@ -10,10 +10,14 @@ angular.module('angyeoApp')
     $scope.showDescription = false;
     $scope.showFollowing = false;
     $scope.companyList=[];
+    // $scope.testbuttonresult = 'nothing at first';
+    // $scope.testbutton = function() {
+    //   $scope.testbuttonresult = 'YOYOYO';
+    // };
     // Save the company list into scope
     $http.get('/getCompanyList').success(function(data){
-      console.log('got company list');
-      console.log(data);
+      // console.log('got company list');
+      // console.log(data);
       for (var key in data){
         $scope.companyList.push(key);
       }
@@ -21,20 +25,44 @@ angular.module('angyeoApp')
     // Retrieves logged in user's data and saves to $scope.user
     $http.get('/loggedin').success(function(user){
       $scope.user = user;
-      $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
-      });
+      // TWITTER
+      // $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
+      // }); 
       $scope.showRSS();
       //RSS Feed
       // $http.get('/rss').success(function(feedData){
       //   $scope.rssData = feedData;
       // });
-      
       if ($scope.user.following){
         for (var key in $scope.user.following) {
           $scope.follow.push(key);
         } 
       }
     });
+
+    // Modal
+    $scope.initialCos = ['co1', 'co2', 'co3'];
+    $scope.newsSources = ['source1', 'srouce2', 'source3'];
+    // $scope.items = ['item1', 'item2', 'item3'];
+
+  // $scope.open = function () {
+
+  //   var modalInstance = $modal.open({
+  //     templateUrl: 'myModalContent.html',
+  //     controller: ModalInstanceCtrl,
+  //     resolve: {
+  //       items: function () {
+  //         return $scope.items;
+  //       }
+  //     }
+  //   });
+
+  //   modalInstance.result.then(function (selectedItem) {
+  //     $scope.selected = selectedItem;
+  //   }, function () {
+  //     // $log.info('Modal dismissed at: ' + new Date());
+  //   });
+  // };
 
     $scope.logout = function(){
       $http.post('/logout');
@@ -100,14 +128,9 @@ angular.module('angyeoApp')
       // $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
       //   $scope.numPosts = postdata['num_posts'];
       // });
-
-      $http({
-      method: 'JSONP',
-      url: 'http://api.crunchbase.com/v/1/company/'+query+'.js?api_key=a72hgev95qzstgam5aukbeqe&callback=JSON_CALLBACK'
-    }).success(function(data){
-        // console.log(data);
-        // data.posts = $scope.checkPosts(data.name);
-        $scope.queries.push(data);
+      $http({method: 'GET', url: '/api/crunchbase/profile', params: [query]}).success(function(data){
+        // console.log('data received ',data);
+        $scope.query = data;
     }).error(function(data, status){
         console.log('ERROR!');
       });
@@ -126,7 +149,44 @@ angular.module('angyeoApp')
       console.log(user);
       return user;
     };
-    
+}])
+.controller('ModalDemoCtrl', ['$scope', '$modal', function($scope, $modal){
+  $scope.items = ['item1', 'item2', 'item3'];
+
+  $scope.open = function () {
+    console.log('SCOPE OPEN CALLED');
+    var modalInstance = $modal.open({
+      templateUrl: 'myModalContent.html',
+      controller: 'ModalInstanceCtrl',
+      resolve: {
+        items: function () {
+          return $scope.items;
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      // $log.info('Modal dismissed at: ' + new Date());
+    });
+  };
+
+}])
+.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', 'items', function ($scope, $modalInstance, items) {
+  $scope.items = items;
+  $scope.selected = {
+    item: $scope.items[0]
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+}]);
     // $scope.twitterStream = function(){
     // };
     
@@ -145,7 +205,6 @@ angular.module('angyeoApp')
   //     isLogged: false,
   //     username: ''
   //   };
-  }]);
   // .controller('NewCtrl', ['$scope', function($scope){}
   //   $scope.testData;
   // ]);

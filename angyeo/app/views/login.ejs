@@ -1,12 +1,14 @@
-<h1>Welcome to Crunchlytics</h1>
+<!--<h1>Welcome to Crunchlytics</h1>
 <div>
-	<a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a>
+<a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a>
 </div>
+-->
+
 
 <!-- Carousel
     ================================================== -->
 <div id="myCarousel" class="carousel slide">
-  <!-- Indicators -->
+
   <ol class="carousel-indicators">
     <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
     <li data-target="#myCarousel" data-slide-to="1"></li>
@@ -19,7 +21,8 @@
         <div class="carousel-caption">
           <h1>Example headline.</h1>
           <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-          <p><a class="btn btn-large btn-primary" href="/auth/facebook">Sign in with Facebook</a></p>
+          <p><a class="btn btn-large btn-primary" href="/auth/facebook">Sign in with Facebook</a><button class="btn" ng-click="open()">Open me!</button>
+          </p>
         </div>
       </div>
     </div>
@@ -29,7 +32,8 @@
         <div class="carousel-caption">
           <h1>Another example headline.</h1>
           <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-          <p><a class="btn btn-large btn-primary" href="/auth/facebook#">Sign in with Facebook</a></p>
+          <p><a class="btn btn-large btn-primary" href="/auth/facebook">Sign in with Facebook</a><button class="btn" ng-click="open()">Open me!</button>
+          </p>
         </div>
       </div>
     </div>
@@ -39,19 +43,20 @@
         <div class="carousel-caption">
           <h1>One more for good measure.</h1>
           <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nib ultricies vehicula ut id elit.</p>
-          <p><a class="btn btn-large btn-primary" href="/auth/facebook">Sign in with Facebook</a></p>
+          <p><a class="btn btn-large btn-primary" href="/auth/facebook">Sign in with Facebook</a><button class="btn" ng-click="open()">Open me!</button>
+          </p>
         </div>
       </div>
     </div>
   </div>
   <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
   <a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-</div><!-- /.carousel -->
+</div>
+
+<!--/.carousel -->
 
 <!-- Marketing messaging and featurettes
     ================================================== -->
-    
-
 
       <!-- START THE FEATURETTES 
        <hr class="featurette-divider">
@@ -59,7 +64,7 @@
 
      
 
-      <div class="row featurette">
+     <div class="row featurette">
         <div class="col-md-7">
           <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It'll blow your mind.</span></h2>
           <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
@@ -93,9 +98,10 @@
         </div>
       </div>
 
-      <hr class="featurette-divider">
+      <hr class="featurette-divider"> 
 
       <!-- /END THE FEATURETTES -->
+
        <!-- FOOTER -->
       <footer>
         <p class="pull-right"><a href="#">Back to top</a></p>

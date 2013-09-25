@@ -32,8 +32,13 @@ var crunchlApp = angular.module('angyeoApp', ['ui.bootstrap'])
         }
       })
       .when('/login', {
-        templateUrl: 'views/login.ejs'
+        templateUrl: 'views/login.ejs',
+        // controller: 'MainCtrl'
       })
+      // .when('/userSelections', {
+      //   templateUrl: 'views/userSelections.ejs'
+      //   // controller: 'ModalDemoCtrl'
+      // })
       // .when('/_=_', {
       //   templateUrl: 'views/test.ejs',
         // controller: 'FbCtrl'
