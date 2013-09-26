@@ -1,6 +1,6 @@
 <div class = 'container'>
   <div class='header'>
-    <div><h2 class='pull-left header-logo'>DataHound</h2></div>
+    <div><img src='../images/DataHound01cropped.png' height='100' class='pull-left'></div>
     <ul class='nav nav-pills pull-right' role='navigation'>
       <li><a href='' ng-click=''>Home</a></li>
       <li><a href='/about' ng-click=''>About</a></li>
@@ -8,17 +8,22 @@
   </ul>
   <br>
   </div>
-  <br>
-  <!-- <hr> -->
+  <hr>
+  {{clock}}
   <!-- <h1>Welcome to crunchlytics</h1> -->
   <!-- <div ng-show='authenticated(tester)'> Log in below </div>
   <div ng-show='authenticated(tester)'> if you're logged in, your username is {{user}}</div> -->
   <!-- <h3>User: {{user.displayname}}
   <h4>User info: {{user}}</h4> -->
   <!-- <a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a> -->
-
-  <br>
+<!-- COMPLETE QUICK SEARCH FUNCTIONALITY-->
+  <br><br><br>
+  <h4><i>Quick Search</i></h4>
+  <input id='quickSearchQuery' type = 'text' ng-model='quickSearchCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:8' | orderBy: 'company'/>
+  <input type='submit' value='Submit' ng-click='quickSearch(quickSearchCo)'/>
+  <br><br>
   <button class="btn" ng-click="open()">Personalize</button>
+  <script>document.getElementById('quickSearchQuery').focus()</script>
   <!-- <br><div>
       Add a company to follow:  <input id='userQuery' ng-model='userSearch'/>
 
@@ -66,23 +71,41 @@
         <div class='well'>
           <h4>Recent news for companies you're following:</h4>
           <ul ng-repeat='post in rssData' class='media panel panel-info'>
-            <a class="pull-left" href="">
-              <img class="media-object" src="{{post.imageUrl}}" alt="">
-            </a>
+            <img class="media-object pull-left" src="{{post.imageUrl}}" alt="">
             <div class='media-body'>
               <li ng-click='postClick($index)' class='media-heading'><b>{{post.title+':'}}</b></li>
-              <li ng-bind-html-unsafe='post.description' ng-show='checkDescription($index)'></li>
+              <div ng-show='checkDescription($index)'>
+                <li ng-bind-html-unsafe='post.description'>
+                </li>
+                <h6><i>Original post: <a href='{{post.url}}'>{{post.url}}</a></i></h6>
+                <b>Tags:</b>
+                <div class='btn-group btn-group-xs' ng-repeat='tag in post.categories'>
+                  <button class='btn'>{{tag}}</button>&nbsp&nbsp
+                </div>
+              </div>
               <h6>{{post.pubdate}}</h6>
               <li>{{post.source}}</li>
             </div>
           </ul>
         </div>
       </tab>
-      <tab heading='Company Profile'>
-        <div>Company profiles go here</div>
+      <tab heading='Quick Profiles'>
+        <br>
+        <div class='well'>
+          <h4>Summary Profiles</h4>
+          <ul class='media panel panel-info'>
+            <div class='media-body'>
+            </div>
+          </ul>
+        </div>
       </tab>
-      <tab heading='Crunchlytics Data' disabled='tab.disabled'>
-        <div>Crunchlytics Data goes here</div>
+      <tab heading='Company Profile' disabled='tab.disabled'>
+        <br>
+        <div class='well'>Crunchlytics Data goes here</div>
+      </tab>
+      <tab heading='Analytics' disabled='tab.disabled'>
+        <br>
+        <div class='well'>Crunchlytics Data goes here</div>
       </tab>
     </tabset>
     <!-- <tabset vertical='true' type='navType'> -->

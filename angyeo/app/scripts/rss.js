@@ -9,7 +9,13 @@ var rssFeeds = module.exports.rssFeeds = [
 'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss',
 'http://www.techmeme.com/feed.xml',
 'http://feeds.feedburner.com/techcrunch/?format=xml',
-'http://allthingsd.com/category/news/feed/'
+'http://allthingsd.com/category/news/feed/',
+'http://feeds.mashable.com/Mashable?format=xml',
+'http://feeds.gawker.com/gizmodo/full?format=xml',
+'http://feeds.feedburner.com/businessinsider?format=xml',
+'http://feeds.feedburner.com/ommalik?format=xml',
+'http://online.wsj.com/xml/rss/3_7455.xml',
+'http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml'
 ];
 
 module.exports.getFeed = function(app, feedUrl){
@@ -39,7 +45,8 @@ module.exports.getFeed = function(app, feedUrl){
     .on('readable', function (data) {
       var stream = this, item;
       while (item = stream.read()) {
-        // console.log(item.categories);
+        // console.log(item.link);
+        // console.log(item.source);
         // console.log(moment(item.pubdate).format("MM-DD-YYYY"));
         // console.log('Got article: ', item.title || item.description);
         feed.push({
@@ -49,7 +56,8 @@ module.exports.getFeed = function(app, feedUrl){
           url: item.link,
           image: item.image,
           pubdate: item.pubdate,
-          source: item.source
+          source: item.source,
+          categories: item.categories
         });
       }
 
@@ -90,12 +98,13 @@ module.exports.getFeed = function(app, feedUrl){
           feedAdditions[i].title, 
           feedAdditions[i].summary, 
           feedAdditions[i].description, 
-          feedAdditions[i].link, 
+          feedAdditions[i].url, 
           feedAdditions[i].image.url, 
           feedAdditions[i].image.title,
           moment(feedAdditions[i].pubdate).format("MMMM Do YYYY h:mm a"), 
           feedAdditions[i].source,
-          db.checkCompanyList(feedAdditions[i].title)
+          feedAdditions[i].categories,
+          db.checkCompanyList(feedAdditions[i].title, feedAdditions[i].categories)
           );
       };
       

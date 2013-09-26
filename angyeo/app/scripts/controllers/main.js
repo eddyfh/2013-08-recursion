@@ -1,20 +1,15 @@
 'use strict';
-//FIX SO THAT ONLY ADDS COMPANIES IN ONE PLACE
 angular.module('angyeoApp')
-  .controller('MainCtrl', ['$scope', 'sharedServices', '$http', '$modal', function ($scope, sharedServices, $http, $modal) {
+  .controller('MainCtrl', ['$scope', 'sharedServices', '$http', '$modal', '$timeout', function ($scope, sharedServices, $http, $modal, $timeout) {
     $scope.query = false;
-    // $scope.follow = [];
     $scope.queried = false;
     $scope.tweets = [];
     $scope.user;
     $scope.showDescription = {};
     $scope.showFollowing = false;
     $scope.companyList=[];
-    // Save the company list into scope
-    // TURN THIS INTO A SERVICE
+    // TURN THIS INTO A SERVICE?
     $http.get('/getCompanyList').success(function(data){
-      // console.log('got company list');
-      // console.log(data);
       for (var key in data){
         $scope.companyList.push(key);
       }
@@ -24,25 +19,32 @@ angular.module('angyeoApp')
     $http.get('/loggedin').success(function(user){
       $scope.user = user;
       sharedServices.setUser($scope.user);
-      // TWITTER
-      // $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
-      // }); 
       sharedServices.showRSS($scope.user, function(data){
         $scope.rssData = data;
-        console.log($scope.rssData);
       });
-
-      // $scope.showRSS();
-      //RSS Feed
-      // $http.get('/rss').success(function(feedData){
-      //   $scope.rssData = feedData;
+      // TWITTER
+      // $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
       // });
-      // if ($scope.user.following){
-      //   for (var key in $scope.user.following) {
-      //     $scope.follow.push(key);
-      //   } 
-      // }
     });
+    $scope.localRSS = function(){
+      console.log('SHOW RSS RUNING');
+    };
+
+    setInterval(function(){
+        $scope.$apply(function() {
+          sharedServices.showRSS($scope.user, function(data){
+            $scope.rssData = data;
+          });
+        });
+    }, 5000);
+
+    // setInterval(function(){
+    //   $scope.$apply(function(){
+    //     sharedServices.showRSS($scope.user, function(data){
+    //       $scope.rssData = data;
+    //     });
+    //   }, 15000);
+    // });
 
     $scope.logout = function(){
       $http.post('/logout');
@@ -56,12 +58,6 @@ angular.module('angyeoApp')
     //   // socket.emit('my other event', { my: 'data' });
     // });
 
-    // $scope.showRSS = function(){
-    //   $http({method: 'GET', url: '/rss', params: {'user':$scope.user}}).success(function(data){
-    //     console.log('running ShowRSS');
-    //     $scope.rssData = data;
-    //   });
-    // };
     $scope.postClick = function(index){
       if ($scope.showDescription[index] === true){
         $scope.showDescription[index] = false;
@@ -114,12 +110,12 @@ angular.module('angyeoApp')
   $scope.open = function () {
     var modalInstance = $modal.open({
       templateUrl: 'myModalContent.html',
-      controller: 'ModalInstanceCtrl'
-      // resolve: {
-      //   items: function () {
-      //     return $scope.items;
-      //   }
-      // }
+      controller: 'ModalInstanceCtrl',
+      resolve: {
+        modalClose: function(){
+          $scope.localRSS();
+        }
+      }
     });
   };
 }])
@@ -132,7 +128,7 @@ angular.module('angyeoApp')
     //   // $log.info('Modal dismissed at: ' + new Date());
     // });
 }])
-.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', '$http', 'sharedServices', function ($scope, $modalInstance, $http, sharedServices) {
+.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', '$http', 'sharedServices', 'modalClose', function ($scope, $modalInstance, $http, sharedServices, modalClose) {
   $scope.companyList = [];
   $scope.user = sharedServices.getUser();
   $scope.user.following = $scope.user.following || [];
@@ -148,7 +144,7 @@ angular.module('angyeoApp')
       console.log('added to DB');
     });
     sharedServices.setUser($scope.user);
-    $scope.rssData = sharedServices.showRSS($scope.user); // probably not needed
+    modalClose = true;
     $modalInstance.close();
   };
   $scope.removeTemp = function(company){

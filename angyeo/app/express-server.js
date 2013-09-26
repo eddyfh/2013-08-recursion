@@ -2,7 +2,7 @@ var express = require('express'),
     app = module.exports = express(),
     http = require('http'),
     server = http.createServer(app),
-    io = module.exports.io = require('socket.io').listen(server),
+    // io = module.exports.io = require('socket.io').listen(server),
     env = process.env.NODE_ENV || 'development',
     port = 8000,
     config = module.exports.config = require('./config/config')[env],
@@ -41,11 +41,15 @@ var db = require('./scripts/db'),
 
 // Routes
 require('./scripts/routes')(app, config);
-setInterval(function(){
-  for (var i = 0; i < rss.rssFeeds.length; i++){
-    rss.getFeed(app, rss.rssFeeds[i]); 
-  }
-  }, 15000); // should run every 2 minutes (every minute currently)
+
+// for (var i = 0; i < rss.rssFeeds.length; i++){
+//   rss.getFeed(app, rss.rssFeeds[i]);
+// }
+// setInterval(function(){
+//   for (var i = 0; i < rss.rssFeeds.length; i++){
+//     rss.getFeed(app, rss.rssFeeds[i]);
+//   }
+//   }, 60000); // should run every 2 minutes (every minute currently)
 // io.sockets.on('connection', function (socket) {
 //         twit.stream('statuses/filter', {track: companies}, function(stream) {
 //           stream.on('data', function (data) {
@@ -62,6 +66,7 @@ db.saveLocalCompanyList(); // Saves list in db to local variable
 //   console.log('results is ', db.checkCompanyList('VMware is in the title'));
 // }, 2000);db.testPost();
 console.log('Express server listening on port '+port);
+
 
 
 /*

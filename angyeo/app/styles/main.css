@@ -48,3 +48,8 @@ body {
 .panel-info {
   padding: 5px;
 }
+
+.postTags {
+  display: inline-block;
+  list-style-type: none;
+}

@@ -3,6 +3,8 @@ var mongoose = require('mongoose'),
 var fs = require('fs');
 var path = require('path');
 var loadedCompanyList = module.exports.loadedCompanyList = {}; // load the company list into an object; this object looks like 
+var request = require('request');
+var apikey = require('../express-server').apikey;
 //{companyname: crunchbaseURL}  - probably should not be saved this way
 
 // module.exports.addUser = function(config, profile){
@@ -31,12 +33,13 @@ var postSchema = mongoose.Schema({
   imageTitle: 'string',
   pubdate: 'string',
   source: 'string',
+  categories: 'array',
   companies: 'array'
 });
 
 var Post = module.exports.Post = mongoose.model('Post', postSchema);
 
-var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, source, companies){
+var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, source, categories, companies){
   Post.find({'title': title}).exec(function(err, docs){
     if(docs[0]){
       // duplicate, so do nothing
@@ -52,6 +55,7 @@ var savePost = module.exports.savePost = function(title, summary, description, u
         imageTitle: imageTitle,
         pubdate: pubdate,
         source: source,
+        categories: categories,
         companies: companies
       });
       newPost.save();
@@ -80,15 +84,17 @@ var getLastPost = module.exports.getLastPost = function(feedUrl, callback){
 
 var companySchema = mongoose.Schema({
   name: 'string',
-  crunchUrl: 'string'
+  crunchUrl: 'string',
+  category_code: 'string'
 });
 
 var Company = mongoose.model('Company', companySchema);
 
-var saveCompany = function(company, crunchUrl){
+var saveCompany = function(company, crunchUrl, category_code){
   var newCompany = new Company({
     name: company,
-    crunchUrl: crunchUrl
+    crunchUrl: crunchUrl,
+    category_code: category_code
   });
   newCompany.save();
 };
@@ -105,7 +111,7 @@ var readList = function(filePath, cb){
     cb(data);
   });
 };
-// Clears out db, then creates all new list
+// Clears out db, then creates all new list - can delete?
 var createCompanyList = module.exports.createCompanyList = function(){
   Company.find().remove();
   readList(path.join(__dirname,'../data/companylist.csv'), function(data){
@@ -119,7 +125,7 @@ var createCompanyList = module.exports.createCompanyList = function(){
 
 // Could try to use regex to find matches, but prob easier to convert everything to lcase
 // Fn takes an article title, checks for any company matches, returns array of matches
-var checkCompanyList = module.exports.checkCompanyList = function(title){
+var checkCompanyList = module.exports.checkCompanyList = function(title, categories){
   // console.log(loadedCompanyList,'in checkCoList');
   var results = [];
   var lcaseCompanyList=[];
@@ -128,21 +134,22 @@ var checkCompanyList = module.exports.checkCompanyList = function(title){
   }
   // console.log(lcaseCompanyList);
   titleWords = title.toLowerCase().split(' ');
-  // console.log(titleWords);
-  for (var i = 0; i < titleWords.length; i++){
-    if (lcaseCompanyList[titleWords[i]]){
-      results.push(titleWords[i]);
+  wordList = titleWords.concat(categories);
+  // console.log(wordList);
+  for (var i = 0; i < wordList.length; i++){
+    if (lcaseCompanyList[wordList[i]]){
+      results.push(wordList[i]);
     }
   }
   // check for 2- and 3-word company names
-  for (var i = 0; i < titleWords.length - 1; i++){
-    if (lcaseCompanyList[titleWords[i]+' '+titleWords[i+1]]){
-      results.push(titleWords[i]+' '+titleWords[i+1]);
+  for (var i = 0; i < wordList.length - 1; i++){
+    if (lcaseCompanyList[wordList[i]+' '+wordList[i+1]]){
+      results.push(wordList[i]+' '+wordList[i+1]);
     }
   }
-  for (var i = 0; i < titleWords.length - 2; i++){
-    if (lcaseCompanyList[titleWords[i]+' '+titleWords[i+1] + ' ' + titleWords[i+2]]){
-      results.push(titleWords[i]+' '+titleWords[i+1]+' '+titleWords[i+2]);
+  for (var i = 0; i < wordList.length - 2; i++){
+    if (lcaseCompanyList[wordList[i]+' '+wordList[i+1] + ' ' + wordList[i+2]]){
+      results.push(wordList[i]+' '+wordList[i+1]+' '+wordList[i+2]);
     }
   }
   if (results.length<1){
@@ -156,12 +163,32 @@ var checkCompanyList = module.exports.checkCompanyList = function(title){
 
 var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
   Company.find().exec(function(err, docs){
+    console.log(docs.length,' companies in DB');
     for (var i = 0; i < docs.length; i++){
       loadedCompanyList[docs[i].name] = docs[i].crunchUrl;
     }
     // console.log(loadedCompanyList, 'in saveLocal');
   });
 };
+
+// BELOW IS TO GET TC COMPANIES:
+var getAllCos = module.exports.getAllCos = function(){
+  console.log('Retrieving all companies list from Crunchbase...');
+  request.get('http://api.crunchbase.com/v/1/companies.js?api_key='+apikey,
+    function(e,response,body){
+      console.log('Finished retrieving!');
+      var data = JSON.parse(body);
+      // console.log(data[1].name);
+      // console.log('/company/'+data[1].permalink);
+      // console.log(data[1].category_code);
+      for (var i = 0; i < data.length; i++){
+        saveCompany(data[i].name, data[i].permalink, data[i].category_code)
+      }
+      console.log('===== NEW DATABASE SAVED =====');
+  });
+};
+
+// getAllCos();
 
 //   LastPost.find({feedUrl: feedUrl}, function(err, docs){
 //     if (docs[0]){
