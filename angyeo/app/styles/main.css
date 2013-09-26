@@ -44,3 +44,7 @@ body {
 .hide {
     display: none;
 }
+
+.panel-info {
+  padding: 5px;
+}

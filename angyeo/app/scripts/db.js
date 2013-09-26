@@ -37,18 +37,26 @@ var postSchema = mongoose.Schema({
 var Post = module.exports.Post = mongoose.model('Post', postSchema);
 
 var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, source, companies){
-  var newPost = new Post({
-    title: title,
-    summary: summary,
-    description: description,
-    url: url,
-    imageUrl: imageUrl,
-    imageTitle: imageTitle,
-    pubdate: pubdate,
-    source: source,
-    companies: companies
+  Post.find({'title': title}).exec(function(err, docs){
+    if(docs[0]){
+      // duplicate, so do nothing
+    }
+    else {
+      // new title
+      var newPost = new Post({
+        title: title,
+        summary: summary,
+        description: description,
+        url: url,
+        imageUrl: imageUrl,
+        imageTitle: imageTitle,
+        pubdate: pubdate,
+        source: source,
+        companies: companies
+      });
+      newPost.save();
+    }
   });
-  newPost.save();
 };
 // lastPost saves down all the most recent posts for each feed
 var lastPostSchema = mongoose.Schema({
@@ -112,11 +120,13 @@ var createCompanyList = module.exports.createCompanyList = function(){
 // Could try to use regex to find matches, but prob easier to convert everything to lcase
 // Fn takes an article title, checks for any company matches, returns array of matches
 var checkCompanyList = module.exports.checkCompanyList = function(title){
+  // console.log(loadedCompanyList,'in checkCoList');
   var results = [];
   var lcaseCompanyList=[];
   for (var key in loadedCompanyList){
-    lcaseCompanyList.push(key.toLowerCase());
+    lcaseCompanyList[key.toLowerCase()] = loadedCompanyList[key];
   }
+  // console.log(lcaseCompanyList);
   titleWords = title.toLowerCase().split(' ');
   // console.log(titleWords);
   for (var i = 0; i < titleWords.length; i++){
@@ -149,6 +159,7 @@ var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
     for (var i = 0; i < docs.length; i++){
       loadedCompanyList[docs[i].name] = docs[i].crunchUrl;
     }
+    // console.log(loadedCompanyList, 'in saveLocal');
   });
 };
 

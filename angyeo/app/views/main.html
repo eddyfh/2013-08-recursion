@@ -1,34 +1,4 @@
 <div class = 'container'>
-
-<!-- should separate this-->
-<div ng-controller='ModalDemoCtrl'>
-  <script type="text/ng-template" id="myModalContent.html">
-  <div class='modal-dialog'>
-  <div class='modal-content'>
-  <div class='modal-header'>asdf</div>
-    <div class="modal-body">
-    Pick companies to follow (at least 2)
-    Add a company to follow: <!-- <input id='userQuery' ng-model='userSearch'/> -->
-      <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:8' | orderBy: 'company'/>
-      <input type='submit' value='Submit' ng-click='tempSave(selectedCo)'/>
-      <div>Your companies (click to remove):</div>
-            <ul>
-                <li  ng-repeat="company in follow" ng-click='removeTemp(company)'>{{company}}</li>
-            </ul>
-            Selected: <b>{{ selected.item }}</b>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="ok()">OK</button>
-            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-        </div>
-        </div>
-  </div>
-  </script>
-  <!-- <button ng-click='testbutton()'>asfd</button> -->
-  <!-- {{testbuttonresult}} -->
-  <button class="btn" ng-click="open()">Create new account</button>
-</div>
-
   <div class='header'>
     <div><h2 class='pull-left header-logo'>DataHound</h2></div>
     <ul class='nav nav-pills pull-right' role='navigation'>
@@ -47,14 +17,16 @@
   <h4>User info: {{user}}</h4> -->
   <!-- <a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a> -->
 
+  <br>
+  <button class="btn" ng-click="open()">Personalize</button>
+  <!-- <br><div>
+      Add a company to follow:  <input id='userQuery' ng-model='userSearch'/>
 
-  <br><div>
-      Add a company to follow: <!-- <input id='userQuery' ng-model='userSearch'/> -->
       <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:8' | orderBy: 'company'/>
       <input type='submit' value='Submit' ng-click='userSubmit(selectedCo)'/>
       <script>document.getElementById('userQuery').focus()</script>
     </div>
-    <br>
+    <br> -->
     <!-- <div class='media' ng-show='query'>
       <img class='media-object' src='"http://www.crunchbase.com/{{query.image.available_sizes[0][1]}}' height='40'>
       <div class='media-body'>
@@ -74,26 +46,32 @@
       {{listing.name}} 
     </div> -->
       <!-- <input type = 'submit' value = 'Twittertest' ng-click='TwitTest()'/> -->
-    Enter an email to receive updates on companies: <input ng-model='userEmail'/>
+    <!-- Enter an email to receive updates on companies: <input ng-model='userEmail'/> -->
 
-    <input type='submit' value = 'Submit' ng-click='saveEmail(userEmail)'/>
+    <!-- <input type='submit' value = 'Submit' ng-click='saveEmail(userEmail)'/> -->
   <br><br>
+
+<!--             <accordion-group heading="{{post.title}}" ng-repeat='post in rssData'>
+            {{post.pubdate}}
+            {{post.source}}
+            </accordion-group> -->
   <div>
     <tabset>
       <tab heading='Company News' active = 'tab.active'>
-        <p ng-click='showFollowingToggle()'>[Click to see companies you're following]</p>
+        <!-- <p ng-click='showFollowingToggle()'>[Click to see companies you're following]</p>
         <ul ng-repeat='listing in follow' ng-show='showFollowing'>
           <li>{{listing}}</li>
-        </ul>
-        <div>Recent news for companies you're following:
-          <!-- <input type = 'submit' value = 'Show RSS' ng-click='showRSS()'/> -->
-          <ul ng-repeat='post in rssData' class='media'>
+        </ul> -->
+        <br>
+        <div class='well'>
+          <h4>Recent news for companies you're following:</h4>
+          <ul ng-repeat='post in rssData' class='media panel panel-info'>
             <a class="pull-left" href="">
               <img class="media-object" src="{{post.imageUrl}}" alt="">
             </a>
             <div class='media-body'>
-              <li ng-click='postClick()' class='media-heading'><b>{{post.title+':'}}</b></li>
-              <li ng-bind-html-unsafe='post.description' ng-show='showDescription'></li>
+              <li ng-click='postClick($index)' class='media-heading'><b>{{post.title+':'}}</b></li>
+              <li ng-bind-html-unsafe='post.description' ng-show='checkDescription($index)'></li>
               <h6>{{post.pubdate}}</h6>
               <li>{{post.source}}</li>
             </div>
@@ -129,7 +107,34 @@
 
 <div></div>
 
+<!-- MODAL - should probably separate this code-->
 
+  <script type="text/ng-template" id="myModalContent.html">
+  <div class='modal-dialog'>
+    <div class='modal-content'>
+      <div class='modal-header'><h3>Customize Your Hound</h3></div>
+        <div class="modal-body">
+          Pick companies to follow (at least 2):
+          <br>
+          <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:8' | orderBy: 'company'/>
+          <input type='submit' value='Submit' ng-click='tempSave(selectedCo)'/>
+          <br><br>
+          <div>Your companies (click to remove):</div>
+          <ul>
+            <li  ng-repeat="company in user.following" ng-click='removeTemp(company)'>{{company}}
+            </li>
+          </ul>
+          <p>Email to receive updates when companies are in the news:</p>
+          <input ng-model='userEmail'/>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" ng-click="ok(userEmail)">Save</button>
+          <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  <script>document.getElementById('userQuery').focus()</script>
+  </script>
 
 <!--
 onerror="this.style.display='none'"

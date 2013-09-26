@@ -1,13 +1,13 @@
 'use strict';
-FIX SO THAT ONLY ADDS COMPANIES IN ONE PLACE
+//FIX SO THAT ONLY ADDS COMPANIES IN ONE PLACE
 angular.module('angyeoApp')
-  .controller('MainCtrl', ['$scope', '$http', '$modal', function ($scope, $http, $modal) {
+  .controller('MainCtrl', ['$scope', 'sharedServices', '$http', '$modal', function ($scope, sharedServices, $http, $modal) {
     $scope.query = false;
-    $scope.follow = [];
+    // $scope.follow = [];
     $scope.queried = false;
     $scope.tweets = [];
     $scope.user;
-    $scope.showDescription = false;
+    $scope.showDescription = {};
     $scope.showFollowing = false;
     $scope.companyList=[];
     // Save the company list into scope
@@ -19,22 +19,29 @@ angular.module('angyeoApp')
         $scope.companyList.push(key);
       }
     });
+
     // Retrieves logged in user's data and saves to $scope.user
     $http.get('/loggedin').success(function(user){
       $scope.user = user;
+      sharedServices.setUser($scope.user);
       // TWITTER
       // $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
       // }); 
-      $scope.showRSS();
+      sharedServices.showRSS($scope.user, function(data){
+        $scope.rssData = data;
+        console.log($scope.rssData);
+      });
+
+      // $scope.showRSS();
       //RSS Feed
       // $http.get('/rss').success(function(feedData){
       //   $scope.rssData = feedData;
       // });
-      if ($scope.user.following){
-        for (var key in $scope.user.following) {
-          $scope.follow.push(key);
-        } 
-      }
+      // if ($scope.user.following){
+      //   for (var key in $scope.user.following) {
+      //     $scope.follow.push(key);
+      //   } 
+      // }
     });
 
     $scope.logout = function(){
@@ -49,28 +56,30 @@ angular.module('angyeoApp')
     //   // socket.emit('my other event', { my: 'data' });
     // });
 
-    $scope.showRSS = function(){
-      $http({method: 'GET', url: '/rss', params: [$scope.user]}).success(function(data){
-        console.log('running ShowRSS');
-        $scope.rssData = data;
-      });
-    };
-    $scope.postClick = function(){
-      if ($scope.showDescription === false){
-        $scope.showDescription = true;
+    // $scope.showRSS = function(){
+    //   $http({method: 'GET', url: '/rss', params: {'user':$scope.user}}).success(function(data){
+    //     console.log('running ShowRSS');
+    //     $scope.rssData = data;
+    //   });
+    // };
+    $scope.postClick = function(index){
+      if ($scope.showDescription[index] === true){
+        $scope.showDescription[index] = false;
       } else {
-        $scope.showDescription = false;
+        $scope.showDescription[index]= true;
       }
     };
-    $scope.saveEmail = function(email){
-      $http({method: 'POST', url: '/emailsubmit', params: [email, $scope.user]}).success(function(){
-        console.log('successfully posted');
-      });
+    $scope.checkDescription = function(index){
+      if ($scope.showDescription[index]){
+        return true;
+      } else {
+        return false;
+      }
     };
-    $scope.showFollowingToggle = function(){
-      $scope.showFollowing = !$scope.showFollowing;
-    };
-    $scope.selectedCo = undefined;
+    // $scope.showFollowingToggle = function(){
+    //   $scope.showFollowing = !$scope.showFollowing;
+    // };
+    // $scope.selectedCo = undefined;
     // RSS TEST
     // socket.on('rssFeed', function(data){
     //   $scope.rssData = data;
@@ -91,75 +100,69 @@ angular.module('angyeoApp')
     };
 
     
-    $scope.userFollow = function(name){
-      $scope.follow.push(name);
-      $http({method: 'POST', url: '/followPost', params: [name, $scope.user.userId]}).success(function(){
-        // console.log('added to DB');
-      });
-    };
+    // $scope.userFollow = function(name){
+    //   $scope.follow.push(name);
+    //   $http({method: 'POST', url: '/followPost', params: [name, $scope.user.userId]}).success(function(){
+    //     // console.log('added to DB');
+    //   });
+    // };
 
     $scope.authenticated = function(user){
       console.log(user);
       return user;
     };
-}])
-.controller('ModalDemoCtrl', ['$scope', '$http', '$modal', function($scope, $http, $modal){
-  $scope.items = ['item1', 'item2', 'item3'];
-  
-  $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
-      $http({method: 'GET', url: '/api/crunchbase/profile', params: [query]}).success(function(data){
-        $scope.query = data;
-    }).error(function(data, status){
-        console.log('ERROR!');
-      });
-
-    };
-
   $scope.open = function () {
-    console.log('SCOPE OPEN CALLED');
     var modalInstance = $modal.open({
       templateUrl: 'myModalContent.html',
-      controller: 'ModalInstanceCtrl',
-      resolve: {
-        items: function () {
-          return $scope.items;
-        }
-      }
-    });
-
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
-    }, function () {
-      // $log.info('Modal dismissed at: ' + new Date());
+      controller: 'ModalInstanceCtrl'
+      // resolve: {
+      //   items: function () {
+      //     return $scope.items;
+      //   }
+      // }
     });
   };
 }])
-.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', '$http', 'items', function ($scope, $modalInstance, $http, items) {
-  $scope.items = items; // delete this
+.controller('ModalDemoCtrl', ['$scope', '$http', '$modal', function($scope, $http, $modal){
+
+
+    // modalInstance.result.then(function (selectedItem) {
+    //   $scope.selected = selectedItem;
+    // }, function () {
+    //   // $log.info('Modal dismissed at: ' + new Date());
+    // });
+}])
+.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', '$http', 'sharedServices', function ($scope, $modalInstance, $http, sharedServices) {
   $scope.companyList = [];
-  $scope.follow = [];
-  $scope.user;
-  $http.get('/loggedin').success(function(user){
-      $scope.user = user;
-    });
+  $scope.user = sharedServices.getUser();
+  $scope.user.following = $scope.user.following || [];
   $scope.tempSave = function(company){
-    $scope.follow.push(company);
-    console.log($scope.follow);
+    $scope.user.following.push(company);
+    // console.log($scope.user.following);
   };
-  $scope.ok = function(){
-      $http({method: 'POST', url: '/followPost', params: [$scope.follow, $scope.user.userId]}).success(function(){
-        console.log('added to DB');
-        $modalInstance.close($scope.selected.item);
-      });
-    };
+  $scope.ok = function(email){
+    if (email){
+      $scope.user.email = email;
+    }
+    $http({method: 'POST', url: '/followPost', params: {'user': $scope.user}}).success(function(){
+      console.log('added to DB');
+    });
+    sharedServices.setUser($scope.user);
+    $scope.rssData = sharedServices.showRSS($scope.user); // probably not needed
+    $modalInstance.close();
+  };
   $scope.removeTemp = function(company){
-    console.log('removeTemp');
-    for (var i = 0; i < $scope.follow.length; i++){
-      if ($scope.follow[i] === company){
-        $scope.follow.splice(i,1);
+    for (var i = 0; i < $scope.user.following.length; i++){
+      if ($scope.user.following[i] === company){
+        $scope.user.following.splice(i,1);
       }
     }
-    console.log($scope.follow);
+    // console.log($scope.user.following);
+  };
+  $scope.saveEmail = function(email){
+    $http({method: 'POST', url: '/emailsubmit', params: [email, $scope.user]}).success(function(){
+      console.log('successfully posted');
+    });
   };
   $http.get('/getCompanyList').success(function(data){
       console.log('got company list');
@@ -168,14 +171,6 @@ angular.module('angyeoApp')
         $scope.companyList.push(key);
       }
     });
-  $scope.selected = {
-    item: $scope.items[0]
-  };
-
-  // $scope.ok = function () {
-  //   $modalInstance.close($scope.selected.item);
-  // };
-
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
   };

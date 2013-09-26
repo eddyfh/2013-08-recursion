@@ -36,8 +36,8 @@ app.use(express.bodyParser());
 app.set('view engine', 'ejs');
 
 // Database
-var db = require('./scripts/db');
-    User = db.User;
+var db = require('./scripts/db'),
+    User = db.User; // need this?
 
 // Routes
 require('./scripts/routes')(app, config);
@@ -57,7 +57,10 @@ setInterval(function(){
 
 // db.createCompanyList(); // DON'T RUN EVERY TIME
 db.saveLocalCompanyList(); // Saves list in db to local variable
-// console.log('results is ', db.checkCompanyList('VMware'));
+// console.log(db.loadedCompanyList);
+// setTimeout(function(){
+//   console.log('results is ', db.checkCompanyList('VMware is in the title'));
+// }, 2000);db.testPost();
 console.log('Express server listening on port '+port);
 
 

@@ -22,15 +22,18 @@ module.exports = function(app, config){
 
 // Get user's followed companies, find posts mentioning these companies
   app.get('/rss', function(req, res){
-    var User = JSON.parse(req.query[0]);
-    // console.log('User:',User);
-    var companiesArray=[];
-    for (var key in User.following){
-      // console.dir(key);
-      companiesArray.push(key.toLowerCase());
+    var user = JSON.parse(req.query['user']);
+    companiesArray = user.following;
+    for (var i = 0; i < companiesArray.length; i++){
+      console.dir(companiesArray[i]);
+      companiesArray[i]=companiesArray[i].toLowerCase();
+      console.dir(companiesArray[i]);
     }
-    console.log('companiesArray:', companiesArray);
-    // companiesArray = ['google', 'linkedin'];
+    // console.log('in /rss');
+    console.dir(companiesArray);
+    // console.log(Array.isArray(companiesArray));
+    // console.log('companiesArray:', companiesArray);
+    // companiesArray = ['google', 'instagram'];
     // var start = new Date(2013, 8, 20);
     // var end = new Date(2013, 8, 21);
     Post.find({companies: {$in: companiesArray}}).sort('-pubdate').limit(20).exec(function(err, docs){
@@ -50,7 +53,7 @@ module.exports = function(app, config){
 
   // API server test
   app.get('/api', function(req,res){ 
-    console.log('in app.get');
+    // console.log('in app.get');
     // console.log(req.query[0]);
     var compName = req.query[0]; // THIS SHOULD BE MADE MORE GENERIC
     request.get('http://api.crunchbase.com/v/1/companies/posts?name='+compName+'&api_key='+apikey, 
@@ -67,38 +70,52 @@ module.exports = function(app, config){
   //   res.send(results);
   // });
 
-NEED TO FIX SO THAT ADDS COMPANIES CORRECTLY
+// NEED TO FIX SO THAT ADDS COMPANIES CORRECTLY
 // First retrieves existing companies being followed, then adds new company to follow
   app.post('/followPost', function(req, res){
-  	req.query[0] = JSON.parse(req.query[0]);
-  	console.dir(req.query[0]);
-    console.log('in followpost');
+    var user = JSON.parse(req.query['user']);
+    var companies = user.following;
+    var userId = user.userId;
+    console.log(userId);
+    var setvar = {$set: {}};
+    setvar.$set['following'] = companies;
+    User.update({userId: userId}, setvar, function(){
+      // can do something here
+    });
+    setvar.$set['email'] = user.email; // combine w/ prev?
+    User.update({userId: userId}, setvar, function(){
+      // can do something here
+    });
+    // console.log(companies);
+  	// req.query[0] = JSON.parse(req.query[0]);
+  	// console.dir(req.query[0]);
+    // console.log('in followpost');
     // if (typeof(req.query[0] === 'string')){
     // 	console.log('string');
     // 	console.dir(req.query[0]);
     // } else if (Array.isArray(req.query[0])) {
-      console.log('in array');
-      console.log(req.query[0].length);
-      for (var i = 0; i < req.query[0].length; i++){
-		    var companyName = req.query[0];
-		    var reqUserId = req.query[1];
-		    User.find({userId: reqUserId}, function(err, user){
-		      var companiesFollowed = user[0]['following'] || {};
-		      // Get # of posts from crunchbase for given company
-		      request.get({
-		        url: 'http://api.crunchbase.com/v/1/companies/posts?name='+companyName+'&api_key='+apikey,
-		        json: true}, 
-		      function(e,response, body){
-		        companiesFollowed[companyName] = body['num_posts'];
-		        var setvar = {$set: {}};
-		        setvar.$set['following'] = companiesFollowed; // Need to do it this way to use update properly
-		        User.update({userId: reqUserId}, setvar, function(){
+      // console.log('in array');
+      // console.log(req.query[0].length);
+      // for (var i = 0; i < req.query[0].length; i++){
+		    // var companyName = req.query[0];
+		    // var reqUserId = req.query[1];
+		    // User.find({userId: reqUserId}, function(err, user){
+		    //   var companiesFollowed = user[0]['following'] || {};
+		    //   // Get # of posts from crunchbase for given company
+		    //   request.get({
+		    //     url: 'http://api.crunchbase.com/v/1/companies/posts?name='+companyName+'&api_key='+apikey,
+		    //     json: true}, 
+		    //   function(e,response, body){
+		    //     companiesFollowed[companyName] = body['num_posts'];
+		    //     var setvar = {$set: {}};
+		    //     setvar.$set['following'] = companiesFollowed; // Need to do it this way to use update properly
+		    //     User.update({userId: reqUserId}, setvar, function(){
 		          // can do something here
-        });
-      });
-    });
+        // });
+      // });
+    // });
     // }
-  } // if statement
+  // } // if statement
   });
 
   app.get('/startTwitter', function(req, res){
@@ -154,7 +171,7 @@ NEED TO FIX SO THAT ADDS COMPANIES CORRECTLY
 
 app.get('/getCompanyList', function(req, res){
   console.log('in getcompanylist');
-  console.log(db.loadedCompanyList);
+  // console.log(db.loadedCompanyList);
   res.send(db.loadedCompanyList);
 });
 // WORKING ON THIS

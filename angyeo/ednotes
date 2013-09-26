@@ -1,19 +1,11 @@
 changed 'main.scss' to 'main.css' in styles folder
 
+- clean up, get functionality working for RSS and profile
+- add in RSS
+thurs
+- categories
+
 todo:
-QUESTIONS FOR LARRY
-- Best way to periodically check for updates (so that we can send email updates)? setinterval?
-cron task - every 1 or 5 minutes - queue up on hourly basis to spread out people across hour
-or request animation frame, but cron probably better
-- best way to show most popular articles since last login? popularity of link, article or topic for a time frame? 
-  - tweets, likes, pagerank, 
- - do i need to save down articles to db?
-  - maybe just show last article; rss feeds have unique ID
-- best way to suggest similar companies?
-  - recommendation engine but need to train; rec raccoon
-- can i hack the crunchbase API to get advanced searches & categories?
-
-
 first thing on page load is check if valid user logged in
 change response so ang knows what to render
 

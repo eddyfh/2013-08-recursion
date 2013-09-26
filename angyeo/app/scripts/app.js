@@ -53,12 +53,23 @@ var crunchlApp = angular.module('angyeoApp', ['ui.bootstrap'])
 
   });
 
-crunchlApp.factory('companyListService', function(){
-  var companyList=[];
-  $http.get('/getCompanyList').success(function(data){
-        for (var key in data){
-          companyList.push(key);
-        }
-        return companyList;
+crunchlApp.factory('sharedServices', ['$http', function($http){
+  var user;
+  return {
+    setUser: function(input){
+      user = input;
+    },
+    getUser: function(){
+      return user;
+    },
+    showRSS: function(user, cb){
+      // console.log('user is');
+      // console.log(user);
+      $http({method: 'GET', url: '/rss', params: {'user':user}}).success(function(data){
+        // console.log('running ShowRSS');
+        // console.log(data);
+        cb(data);
       });
-});
+    }
+  };
+}]);
