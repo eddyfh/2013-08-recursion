@@ -176,13 +176,20 @@ app.get('/getCompanyList', function(req, res){
 });
 // WORKING ON THIS
 app.get('/api/crunchbase/profile', function(req,res){
-  var compName = req.query[0];
-  var compUrl = db.loadedCompanyList[compName];
-  request.get({
-        url: 'http://api.crunchbase.com/v/1'+compUrl+'.js?api_key='+apikey},
-      function(e,response, body){
-  res.send(body);
-  });
+  var companies = JSON.parse(req.query['companies']);
+  var companyUrl;
+  var responses = [];
+  for (var i = 0; i < companies.length; i++){
+    companyUrl = db.loadedCompanyList[companies[i]];
+    request.get({
+      url: 'http://api.crunchbase.com/v/1/company/'+companyUrl+'.js?api_key='+apikey},
+    function(e,response, body){
+      responses.push(body);
+      if (responses.length === companies.length){
+        res.send(responses);
+      }
+    });
+  };
 });
 
 

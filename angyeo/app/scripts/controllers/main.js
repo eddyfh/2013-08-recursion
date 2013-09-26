@@ -22,6 +22,17 @@ angular.module('angyeoApp')
       sharedServices.showRSS($scope.user, function(data){
         $scope.rssData = data;
       });
+      // should figure out how to move fetchprofiles somewhere else
+      $scope.fetchProfiles = function(){
+      console.log('running fetchProfiles');
+      $http({method: 'GET', url: '/api/crunchbase/profile', params: {'companies': $scope.user.following}}).success(function(data){
+        $scope.companyProfilesData = data;
+        console.log($scope.companyProfilesData);
+        }).error(function(data, status){
+            console.log('ERROR!');
+          });
+      };
+      $scope.fetchProfiles();
       // TWITTER
       // $http({method: 'GET', url: '/startTwitter', params: [$scope.user.following]}).success(function(user){
       // });
@@ -72,6 +83,9 @@ angular.module('angyeoApp')
         return false;
       }
     };
+    $scope.companyProfilesData = [];
+
+      // $scope.fetchProfiles();
     // $scope.showFollowingToggle = function(){
     //   $scope.showFollowing = !$scope.showFollowing;
     // };
@@ -82,18 +96,19 @@ angular.module('angyeoApp')
     //   $scope.$apply();
     // });
 
-    $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
-      // $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
-      //   $scope.numPosts = postdata['num_posts'];
-      // });
-      $http({method: 'GET', url: '/api/crunchbase/profile', params: [query]}).success(function(data){
-        // console.log('data received ',data);
-        $scope.query = data;
-    }).error(function(data, status){
-        console.log('ERROR!');
-      });
 
-    };
+    // $scope.userSubmit = function(query){ // THESE TWO SHOULD BE COMBINED INTO 1 REQUEST
+    //   // $http({method: 'GET', url: '/api', params: [query]}).success(function(postdata){
+    //   //   $scope.numPosts = postdata['num_posts'];
+    //   // });
+    //   $http({method: 'GET', url: '/api/crunchbase/profile', params: [query]}).success(function(data){
+    //     // console.log('data received ',data);
+    //     $scope.query = data;
+    // }).error(function(data, status){
+    //     console.log('ERROR!');
+    //   });
+
+    // };
 
     
     // $scope.userFollow = function(name){

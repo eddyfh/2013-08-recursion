@@ -89,12 +89,13 @@
           </ul>
         </div>
       </tab>
-      <tab heading='Quick Profiles'>
+      <tab heading='Quick Profiles' ng-click='fetchProfiles()'>
         <br>
         <div class='well'>
           <h4>Summary Profiles</h4>
           <ul class='media panel panel-info'>
-            <div class='media-body'>
+            <div class='media-body' ng-repeat='companyData in companyProfilesData'>
+              test{{companyData.name}}
             </div>
           </ul>
         </div>
