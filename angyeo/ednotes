@@ -1,11 +1,14 @@
 changed 'main.scss' to 'main.css' in styles folder
 
+- filter by categories
 - profile
 - sharing features
 - email updates
+- fix search so it's alpha, not just 8 
+- ask fiverr - what font, sent each piece
+- add footer
+- filter by feed
 
-thurs
-- categories
 - if possible, take out UI bootstrap, use sass (bower preinstall) instead
 - learn to deploy - buy domain, etc
 
@@ -35,6 +38,9 @@ for followed companies:
 custom view
 - news about companies or similar companies since last login
 - just investments/financings vs other
+480x800 mobile
+BUGS
+- make crunchbase/profile async
 
 Techmeme
 http://www.techmeme.com/feed.xml
@@ -62,15 +68,6 @@ image.available_sizes[0]
 
 
 
-name
-logo
-website
-crunchbase link
-employees
-founded
-city
-short description
 [ceo]
 acquisitions
-funding
 products?

@@ -42,14 +42,15 @@ var db = require('./scripts/db'),
 // Routes
 require('./scripts/routes')(app, config);
 
-// for (var i = 0; i < rss.rssFeeds.length; i++){
-//   rss.getFeed(app, rss.rssFeeds[i]);
-// }
-// setInterval(function(){
-//   for (var i = 0; i < rss.rssFeeds.length; i++){
-//     rss.getFeed(app, rss.rssFeeds[i]);
-//   }
-//   }, 60000); // should run every 2 minutes (every minute currently)
+for (var i = 0; i < rss.rssFeeds.length; i++){
+  rss.getFeed(app, rss.rssFeeds[i]);
+}
+setInterval(function(){
+  for (var i = 0; i < rss.rssFeeds.length; i++){
+    rss.getFeed(app, rss.rssFeeds[i]);
+  }
+  }, 60000); // should run every 2 minutes (every minute currently)
+
 // io.sockets.on('connection', function (socket) {
 //         twit.stream('statuses/filter', {track: companies}, function(stream) {
 //           stream.on('data', function (data) {

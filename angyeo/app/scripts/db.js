@@ -90,13 +90,13 @@ var companySchema = mongoose.Schema({
 
 var Company = mongoose.model('Company', companySchema);
 
-var saveCompany = function(company, crunchUrl, category_code){
+var saveCompany = function(company, crunchUrl, category_code, cb){
   var newCompany = new Company({
     name: company,
     crunchUrl: crunchUrl,
     category_code: category_code
   });
-  newCompany.save();
+  newCompany.save(cb);
 };
 
 // May want to clean out 'inc', 'inc.', etc from here
@@ -112,16 +112,21 @@ var readList = function(filePath, cb){
   });
 };
 // Clears out db, then creates all new list - can delete?
-var createCompanyList = module.exports.createCompanyList = function(){
-  Company.find().remove();
-  readList(path.join(__dirname,'../data/companylist.csv'), function(data){
-    console.log(data);
-    for (var i = 0; i < data.length; i++){
-      saveCompany(data[i][1], data[i][0]);
-    }
-    console.log('COMPANY MASTER LIST SAVED TO DB');
-  });
-};
+// var createCompanyList = module.exports.createCompanyList = function(){
+//   readList(path.join(__dirname,'../data/companylist.csv'), function(data){
+//     console.log(data);
+//     function next(i){
+//       if(i >= data.length) return;
+//       saveCompany(data[i][1], data[i][0], function(err){
+//         if(err) throw err;
+//         console.log('saved', i);
+//         next(i++);
+//       });
+//     }
+//     next(0);
+//     console.log('COMPANY MASTER LIST SAVED TO DB');
+//   });
+// };
 
 // Could try to use regex to find matches, but prob easier to convert everything to lcase
 // Fn takes an article title, checks for any company matches, returns array of matches
@@ -172,7 +177,7 @@ var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
 };
 
 // BELOW IS TO GET TC COMPANIES:
-var getAllCos = module.exports.getAllCos = function(){
+var getAllCos = module.exports.getAllCos = function(cb){
   console.log('Retrieving all companies list from Crunchbase...');
   request.get('http://api.crunchbase.com/v/1/companies.js?api_key='+apikey,
     function(e,response,body){
@@ -181,14 +186,21 @@ var getAllCos = module.exports.getAllCos = function(){
       // console.log(data[1].name);
       // console.log('/company/'+data[1].permalink);
       // console.log(data[1].category_code);
-      for (var i = 0; i < data.length; i++){
-        saveCompany(data[i].name, data[i].permalink, data[i].category_code)
+      var i = 0;
+      function next(){
+        if(i >= data.length) return cb();
+        saveCompany(data[i].name, data[i].permalink, data[i].category_code, function(err){
+          if(err) return cb(err);
+          console.log('saved', i);
+          i++;
+          next();
+        });
       }
-      console.log('===== NEW DATABASE SAVED =====');
+      next(0);
   });
 };
 
-// getAllCos();
+// getAllCos(function(){});
 
 //   LastPost.find({feedUrl: feedUrl}, function(err, docs){
 //     if (docs[0]){

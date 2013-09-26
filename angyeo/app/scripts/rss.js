@@ -15,7 +15,8 @@ var rssFeeds = module.exports.rssFeeds = [
 'http://feeds.feedburner.com/businessinsider?format=xml',
 'http://feeds.feedburner.com/ommalik?format=xml',
 'http://online.wsj.com/xml/rss/3_7455.xml',
-'http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml'
+'http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+'https://news.ycombinator.com/rss'
 ];
 
 module.exports.getFeed = function(app, feedUrl){
@@ -73,19 +74,20 @@ module.exports.getFeed = function(app, feedUrl){
       };
       db.saveLastPost(feedUrl, feedTitles);
       var feedAdditions=[];
-      var duplicate = false;
+      // var duplicate = false;
       // Loop checks for duplicates vs. the last time
-      for (var i = 0; i < feed.length; i++){
-        for (var j = 0; j < lastFeed.length; j++){
-          if (feed[i]['title'] === lastFeed[j]){
-            duplicate = true;
-          }
-        }
-        if (!duplicate){
-          feedAdditions.push(feed[i]);
-        }
-        duplicate = false;
-      }
+      // REMOVED - we're already checking before saving to db?
+      // for (var i = 0; i < feed.length; i++){
+      //   for (var j = 0; j < lastFeed.length; j++){
+      //     if (feed[i]['title'] === lastFeed[j]){
+      //       duplicate = true;
+      //     }
+      //   }
+      //   if (!duplicate){
+      //     feedAdditions.push(feed[i]);
+      //   }
+      //   duplicate = false;
+      // }
       console.log('======= NEW FEED ADDITIONS =========');
       // for (var i = 0; i < feedAdditions.length; i++){
         // console.log(feedAdditions[i]['title']);

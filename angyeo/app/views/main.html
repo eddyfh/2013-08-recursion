@@ -71,9 +71,9 @@
         <div class='well'>
           <h4>Recent news for companies you're following:</h4>
           <ul ng-repeat='post in rssData' class='media panel panel-info'>
-            <img class="media-object pull-left" src="{{post.imageUrl}}" alt="">
+            <img class="media-object postImage" src="{{post.imageUrl}}" alt="">
             <div class='media-body'>
-              <li ng-click='postClick($index)' class='media-heading'><b>{{post.title+':'}}</b></li>
+              <li ng-click='postClick($index)' class='media-heading postHeading'><b>{{post.title+':'}}</b></li>
               <div ng-show='checkDescription($index)'>
                 <li ng-bind-html-unsafe='post.description'>
                 </li>
@@ -93,11 +93,38 @@
         <br>
         <div class='well'>
           <h4>Summary Profiles</h4>
-          <ul class='media panel panel-info'>
-            <div class='media-body' ng-repeat='companyData in companyProfilesData'>
-              test{{companyData.name}}
-            </div>
-          </ul>
+          <!-- <ul class='media panel panel-info'> -->
+            <!-- <div class='media-body' > -->
+              <table class='table table-striped table-responsive table-condensed'>
+                <th>Company</th>
+                <th>Founded</th>
+                <th>Location</th>
+                <th>Employees</th>
+                <th>Description</th>
+                <th>Funding</th>
+                <th>Key People</th>
+                <th>More Info</th>
+                <tr ng-repeat='company in companyProfilesData' class='quickProfileData'>
+                  <td>
+                    <a href='{{company.homepage_url}}'>
+                      <img class='quickProfileImage' alt='{{company.name}}' src="http://www.crunchbase.com/{{company.image.available_sizes[0][1]}}">
+                    </a>
+                  </td>
+                  <td>{{company.founded_month}}/{{company.founded_year}}</td>
+                  <td>{{company.offices[0].city}}, {{company.offices[0].country_code}}</td>
+                  <td>{{company.number_of_employees}}</td>
+                  <td>{{company.description}}</td>
+                  <td>{{company.total_money_raised}}</td>
+                  <td>
+                    <p ng-repeat='person in company.employees'>
+                      <b>{{person[0]}}:</b> {{person[1]}}
+                    </p>
+                  </td>
+                  <td><a href='{{company.crunchbase_url}}'>Crunchbase</a></td>
+                </tr>
+              </table>
+            <!-- </div> -->
+          <!-- </ul> -->
         </div>
       </tab>
       <tab heading='Company Profile' disabled='tab.disabled'>
@@ -138,14 +165,24 @@
     <div class='modal-content'>
       <div class='modal-header'><h3>Customize Your Hound</h3></div>
         <div class="modal-body">
-          Pick companies to follow (at least 2):
+          Pick companies to follow:
           <br>
-          <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:8' | orderBy: 'company'/>
+          <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:20'/>
           <input type='submit' value='Submit' ng-click='tempSave(selectedCo)'/>
           <br><br>
           <div>Your companies (click to remove):</div>
           <ul>
-            <li  ng-repeat="company in user.following" ng-click='removeTemp(company)'>{{company}}
+            <li class='modalCoList' ng-repeat="company in user.following" ng-click='removeTemp(company)'>{{company}}
+            </li>
+          </ul>
+          Pick keywords to follow:
+          <br>
+          <input id='userKeyQuery' type = 'text' ng-model='selectedKey' typeahead='keyword for keyword in keywordList | filter:$viewValue | limitTo:20'/>
+          <input type='submit' value='Submit' ng-click='tempSaveKey(selectedKey)'/>
+          <br><br>
+          <div>Your companies (click to remove):</div>
+          <ul>
+            <li class='modalCoList' ng-repeat="keyword in user.followingKeys" ng-click='removeTempKey(keyword)'>{{keyword}}
             </li>
           </ul>
           <p>Email to receive updates when companies are in the news:</p>

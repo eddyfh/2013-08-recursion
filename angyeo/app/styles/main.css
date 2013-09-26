@@ -48,8 +48,20 @@ body {
 .panel-info {
   padding: 5px;
 }
-
+.postHeading, .modalCoList {
+  cursor: pointer;
+}
 .postTags {
   display: inline-block;
   list-style-type: none;
+}
+
+.quickProfileImage {
+  max-width: 80px;
+  max-height: 40px;
+}
+
+.postImage {
+  float: left;
+  margin: 10px;
 }
