@@ -180,12 +180,12 @@
           <input id='userKeyQuery' type = 'text' ng-model='selectedKey' typeahead='keyword for keyword in keywordList | filter:$viewValue | limitTo:20'/>
           <input type='submit' value='Submit' ng-click='tempSaveKey(selectedKey)'/>
           <br><br>
-          <div>Your companies (click to remove):</div>
+          <div>Your keywords:</div>
           <ul>
             <li class='modalCoList' ng-repeat="keyword in user.followingKeys" ng-click='removeTempKey(keyword)'>{{keyword}}
             </li>
           </ul>
-          <p>Email to receive updates when companies are in the news:</p>
+          <p>Email to receive updates:</p>
           <input ng-model='userEmail'/>
         </div>
         <div class="modal-footer">

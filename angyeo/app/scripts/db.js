@@ -19,7 +19,8 @@ var userSchema = mongoose.Schema({
   displayname: 'string',
   email: 'string',
   queried: 'mixed',
-  following: 'mixed'
+  following: 'mixed',
+  followingKeys: 'mixed'
 });
 var User = module.exports.User = mongoose.model('User', userSchema);
 

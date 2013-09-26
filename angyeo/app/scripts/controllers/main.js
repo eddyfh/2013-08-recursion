@@ -168,9 +168,13 @@ angular.module('angyeoApp')
   $scope.companyList = [];
   $scope.user = sharedServices.getUser();
   $scope.user.following = $scope.user.following || [];
+  $scope.user.followingKeys = $scope.user.followingKeys || [];
   $scope.tempSave = function(company){
     $scope.user.following.push(company);
     // console.log($scope.user.following);
+  };
+  $scope.tempSaveKey = function(keyword){
+    $scope.user.followingKeys.push(keyword);
   };
   $scope.ok = function(email){
     if (email){
@@ -189,7 +193,13 @@ angular.module('angyeoApp')
         $scope.user.following.splice(i,1);
       }
     }
-    // console.log($scope.user.following);
+  };
+  $scope.removeTempKey = function(keyword){
+    for (var i = 0; i < $scope.user.followingKeys.length; i++){
+      if ($scope.user.followingKeys[i] === keyword){
+        $scope.user.followingKeys.splice(i,1);
+      }
+    }
   };
   $scope.saveEmail = function(email){
     $http({method: 'POST', url: '/emailsubmit', params: [email, $scope.user]}).success(function(){

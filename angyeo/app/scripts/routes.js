@@ -70,21 +70,25 @@ module.exports = function(app, config){
   //   res.send(results);
   // });
 
-// NEED TO FIX SO THAT ADDS COMPANIES CORRECTLY
-// First retrieves existing companies being followed, then adds new company to follow
+
+// Below can be cleaned up
   app.post('/followPost', function(req, res){
     var user = JSON.parse(req.query['user']);
     var companies = user.following;
+    var keywords = user.followingKeys;
     var userId = user.userId;
-    console.log(userId);
     var setvar = {$set: {}};
+    var setvar2 = {$set: {}};
+    var setvar3 = {$set: {}};
     setvar.$set['following'] = companies;
     User.update({userId: userId}, setvar, function(){
-      // can do something here
-    });
-    setvar.$set['email'] = user.email; // combine w/ prev?
-    User.update({userId: userId}, setvar, function(){
-      // can do something here
+      setvar2.$set['followingKeys'] = keywords;
+      User.update({userId: userId}, setvar2, function(){
+        setvar3.$set['email'] = user.email; // combine w/ prev?
+        User.update({userId: userId}, setvar3, function(){
+          //callback
+        });
+      });
     });
     // console.log(companies);
   	// req.query[0] = JSON.parse(req.query[0]);
