@@ -5,12 +5,7 @@ var path = require('path');
 var loadedCompanyList = module.exports.loadedCompanyList = {}; // load the company list into an object; this object looks like 
 var request = require('request');
 var apikey = require('../express-server').apikey;
-//{companyname: crunchbaseURL}  - probably should not be saved this way
-
-// module.exports.addUser = function(config, profile){
-//   var newuser = new User({username: profile.username, displayname: profile.displayName});
-//   newuser.save();
-// };
+//{companyname: crunchbaseURL} 
 
 var connector = mongoose.connect(config.db);
 var userSchema = mongoose.Schema({
@@ -46,7 +41,7 @@ var savePost = module.exports.savePost = function(title, summary, description, u
       // duplicate, so do nothing
     }
     else {
-      // new title
+      // new post
       var newPost = new Post({
         title: title,
         summary: summary,
@@ -59,27 +54,15 @@ var savePost = module.exports.savePost = function(title, summary, description, u
         categories: categories,
         companies: companies
       });
-      newPost.save();
+      console.log('Attempting to save...');
+      newPost.save(function(err) {
+        if (err){
+          console.log('ERROR in saving post!');
+        } else {
+          console.log('Saved to DB: ',title);
+        }
+      });
     }
-  });
-};
-// lastPost saves down all the most recent posts for each feed
-var lastPostSchema = mongoose.Schema({
-  feedUrl: 'string',
-  posts: 'mixed'
-});
-var LastPost = module.exports.lastPost = mongoose.model('LastPost', lastPostSchema);
-var saveLastPost = module.exports.saveLastPost = function(feedUrl, posts){
-  LastPost.find({feedUrl: feedUrl}).remove();
-  var newLastPost = new LastPost({
-    feedUrl: feedUrl,
-    posts: posts
-  });
-  newLastPost.save();
-};
-var getLastPost = module.exports.getLastPost = function(feedUrl, callback){
-  LastPost.find({feedUrl: feedUrl}, function(err, docs){
-    callback(docs);
   });
 };
 
@@ -106,12 +89,101 @@ var readList = function(filePath, cb){
     data = data.split('\n');
     for (var i = 0; i < data.length; i++){
       data[i] = data[i].split(',');
-      // data[i][0] = data[i][0].toLowerCase();
-      // data[i][1] = data[i][1].toLowerCase();
     }
     cb(data);
   });
 };
+
+// CAN WE REFACTOR USING INDEXOF?
+// Could try to use regex to find matches, but prob easier to convert everything to lcase
+// Fn takes an article title, checks for any company/category matches, returns array of matches
+var checkCompanyList = module.exports.checkCompanyList = function(title, categories){
+  var results = [];
+  var lcaseCompanyList=[];
+  for (var key in loadedCompanyList){
+    lcaseCompanyList[key.toLowerCase()] = loadedCompanyList[key];
+  }
+  titleWords = title.toLowerCase().split(' ');
+  wordList = titleWords.concat(categories);
+  for (var i = 0; i < wordList.length; i++){
+    if (lcaseCompanyList[wordList[i]]){
+      results.push(wordList[i]);
+    }
+  }
+  // check for 2- and 3-word company names/keywords
+  for (var i = 0; i < wordList.length - 1; i++){
+    if (lcaseCompanyList[wordList[i]+' '+wordList[i+1]]){
+      results.push(wordList[i]+' '+wordList[i+1]);
+    }
+  }
+  for (var i = 0; i < wordList.length - 2; i++){
+    if (lcaseCompanyList[wordList[i]+' '+wordList[i+1] + ' ' + wordList[i+2]]){
+      results.push(wordList[i]+' '+wordList[i+1]+' '+wordList[i+2]);
+    }
+  }
+  if (results.length<1){
+    return null;
+  } else {
+    return results;
+  }
+};
+
+var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
+  Company.find().exec(function(err, docs){
+    console.log(docs.length,' companies in DB');
+    for (var i = 0; i < docs.length; i++){
+      loadedCompanyList[docs[i].name] = docs[i].crunchUrl;
+    }
+    console.log('Company list saved to variable on server');
+  });
+};
+// ==============================================================
+// BELOW IS TO GET TC COMPANIES MASTER LIST (JUST USED OCCASIONALLY)
+// var getAllCos = module.exports.getAllCos = function(cb){
+//   console.log('Retrieving all companies list from Crunchbase...');
+//   request.get('http://api.crunchbase.com/v/1/companies.js?api_key='+apikey,
+//     function(e,response,body){
+//       console.log('Finished retrieving!');
+//       var data = JSON.parse(body);
+//       var i = 0;
+//       function next(){
+//         if(i >= data.length) return cb();
+//         saveCompany(data[i].name, data[i].permalink, data[i].category_code, function(err){
+//           if(err) return cb(err);
+//           console.log('saved', i);
+//           i++;
+//           next();
+//         });
+//       }
+//       next(0);
+//   });
+// };
+
+//=================================================
+// This saves companies from TC with above function
+// getAllCos(function(){});
+//=================================================
+
+// lastPost saves down all the most recent posts for each feed
+// var lastPostSchema = mongoose.Schema({
+//   feedUrl: 'string',
+//   posts: 'mixed'
+// });
+// var LastPost = module.exports.lastPost = mongoose.model('LastPost', lastPostSchema);
+// var saveLastPost = module.exports.saveLastPost = function(feedUrl, posts){
+//   LastPost.find({feedUrl: feedUrl}).remove();
+//   var newLastPost = new LastPost({
+//     feedUrl: feedUrl,
+//     posts: posts
+//   });
+//   newLastPost.save();
+// };
+// var getLastPost = module.exports.getLastPost = function(feedUrl, callback){
+//   LastPost.find({feedUrl: feedUrl}, function(err, docs){
+//     callback(docs);
+//   });
+// };
+
 // Clears out db, then creates all new list - can delete?
 // var createCompanyList = module.exports.createCompanyList = function(){
 //   readList(path.join(__dirname,'../data/companylist.csv'), function(data){
@@ -129,79 +201,6 @@ var readList = function(filePath, cb){
 //   });
 // };
 
-// Could try to use regex to find matches, but prob easier to convert everything to lcase
-// Fn takes an article title, checks for any company matches, returns array of matches
-var checkCompanyList = module.exports.checkCompanyList = function(title, categories){
-  // console.log(loadedCompanyList,'in checkCoList');
-  var results = [];
-  var lcaseCompanyList=[];
-  for (var key in loadedCompanyList){
-    lcaseCompanyList[key.toLowerCase()] = loadedCompanyList[key];
-  }
-  // console.log(lcaseCompanyList);
-  titleWords = title.toLowerCase().split(' ');
-  wordList = titleWords.concat(categories);
-  // console.log(wordList);
-  for (var i = 0; i < wordList.length; i++){
-    if (lcaseCompanyList[wordList[i]]){
-      results.push(wordList[i]);
-    }
-  }
-  // check for 2- and 3-word company names
-  for (var i = 0; i < wordList.length - 1; i++){
-    if (lcaseCompanyList[wordList[i]+' '+wordList[i+1]]){
-      results.push(wordList[i]+' '+wordList[i+1]);
-    }
-  }
-  for (var i = 0; i < wordList.length - 2; i++){
-    if (lcaseCompanyList[wordList[i]+' '+wordList[i+1] + ' ' + wordList[i+2]]){
-      results.push(wordList[i]+' '+wordList[i+1]+' '+wordList[i+2]);
-    }
-  }
-  if (results.length<1){
-    // console.log('none');
-    return null;
-  } else {
-    // console.log(results);
-    return results;
-  }
-};
-
-var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
-  Company.find().exec(function(err, docs){
-    console.log(docs.length,' companies in DB');
-    for (var i = 0; i < docs.length; i++){
-      loadedCompanyList[docs[i].name] = docs[i].crunchUrl;
-    }
-    // console.log(loadedCompanyList, 'in saveLocal');
-  });
-};
-
-// BELOW IS TO GET TC COMPANIES:
-var getAllCos = module.exports.getAllCos = function(cb){
-  console.log('Retrieving all companies list from Crunchbase...');
-  request.get('http://api.crunchbase.com/v/1/companies.js?api_key='+apikey,
-    function(e,response,body){
-      console.log('Finished retrieving!');
-      var data = JSON.parse(body);
-      // console.log(data[1].name);
-      // console.log('/company/'+data[1].permalink);
-      // console.log(data[1].category_code);
-      var i = 0;
-      function next(){
-        if(i >= data.length) return cb();
-        saveCompany(data[i].name, data[i].permalink, data[i].category_code, function(err){
-          if(err) return cb(err);
-          console.log('saved', i);
-          i++;
-          next();
-        });
-      }
-      next(0);
-  });
-};
-
-// getAllCos(function(){});
 
 //   LastPost.find({feedUrl: feedUrl}, function(err, docs){
 //     if (docs[0]){

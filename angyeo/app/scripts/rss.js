@@ -6,115 +6,97 @@ var FeedParser = require('feedparser'),
     moment = require('moment');
 
 var rssFeeds = module.exports.rssFeeds = [
-'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss',
-'http://www.techmeme.com/feed.xml',
-'http://feeds.feedburner.com/techcrunch/?format=xml',
-'http://allthingsd.com/category/news/feed/',
-'http://feeds.mashable.com/Mashable?format=xml',
-'http://feeds.gawker.com/gizmodo/full?format=xml',
-'http://feeds.feedburner.com/businessinsider?format=xml',
-'http://feeds.feedburner.com/ommalik?format=xml',
-'http://online.wsj.com/xml/rss/3_7455.xml',
-'http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
-'https://news.ycombinator.com/rss'
+  'http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss',
+  'http://www.techmeme.com/feed.xml',
+  'http://feeds.feedburner.com/techcrunch/?format=xml',
+  'http://allthingsd.com/category/news/feed/',
+  'http://feeds.mashable.com/Mashable?format=xml',
+  'http://feeds.gawker.com/gizmodo/full?format=xml',
+  'http://feeds.feedburner.com/businessinsider?format=xml',
+  'http://feeds.feedburner.com/ommalik?format=xml',
+  'http://online.wsj.com/xml/rss/3_7455.xml',
+  'http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+  'http://news.ycombinator.com/rss'
 ];
 
 module.exports.getFeed = function(app, feedUrl){
-  var lastFeed;
-  db.getLastPost(feedUrl, function(data){
-    if (data[0]){
-      lastFeed = data[0].posts;
-    } else {
-      lastFeed = [];
-    }
-    // console.log('lastfeed is ');
-    // console.dir(lastFeed);
-  });
-  // app.get('/rss', function(req, res){
   var feed = [];
-  io = app.io;
   request(feedUrl)
     .pipe(new FeedParser())
     .on('error', function(error) {
-      // always handle errors
       console.error(error);
+      return;
     })
     .on('meta', function (meta) {
-      // do something
       // console.log('===== %s =====', meta.title);
     })
     .on('readable', function (data) {
       var stream = this, item;
       while (item = stream.read()) {
-        // console.log(item.link);
-        // console.log(item.source);
-        // console.log(moment(item.pubdate).format("MM-DD-YYYY"));
-        // console.log('Got article: ', item.title || item.description);
+        item.date = item.date || item.pubdate || new Date(); // check for one or the other
+        // console.log('Retrieved article: ', item.title || item.description);
         feed.push({
           title: item.title,
           summary: item,
           description: item.description,
           url: item.link,
           image: item.image,
-          pubdate: item.pubdate,
+          pubdate: item.date,
           source: item.source,
           categories: item.categories
         });
       }
-
-      // console.log('feed data is ');
-    // res.send();
-    // console.dir(feed[1]);
     })
     .on('end', function(){
-      // console.log('should be saving');
       var feedTitles=[];
       for (var i = 0; i < feed.length; i++){
         feedTitles.push(feed[i]['title']);
-      };
-      db.saveLastPost(feedUrl, feedTitles);
+      }
+      // db.saveLastPost(feedUrl, feedTitles);
       var feedAdditions=[];
-      // var duplicate = false;
-      // Loop checks for duplicates vs. the last time
+      for (var i = 0; i < feed.length; i++){
+        feedAdditions.push(feed[i]);
+      }
+      console.log('======= NEW FEED ADDITIONS =========');
+      for (var i = 0; i < feedAdditions.length; i++){
+        // Make sure this matches the savePost arguments required!
+        db.savePost(
+          feedAdditions[i].title,
+          feedAdditions[i].summary,
+          feedAdditions[i].description,
+          feedAdditions[i].url,
+          feedAdditions[i].image.url,
+          feedAdditions[i].image.title,
+          moment(feedAdditions[i].pubdate).format('MMMM Do YYYY h:mm a'),
+          feedAdditions[i].source,
+          feedAdditions[i].categories,
+          db.checkCompanyList(feedAdditions[i].title, feedAdditions[i].categories)
+        );
+      };
+  });
+};
+
       // REMOVED - we're already checking before saving to db?
-      // for (var i = 0; i < feed.length; i++){
+        // var lastFeed;
+  // db.getLastPost(feedUrl, function(data){
+  //   if (data[0]){
+  //     lastFeed = data[0].posts;
+  //   } else {
+  //     lastFeed = [];
+  //   }
+  // });
+        // console.log(feed[i].pubdate);
       //   for (var j = 0; j < lastFeed.length; j++){
       //     if (feed[i]['title'] === lastFeed[j]){
       //       duplicate = true;
       //     }
       //   }
       //   if (!duplicate){
-      //     feedAdditions.push(feed[i]);
       //   }
       //   duplicate = false;
-      // }
-      console.log('======= NEW FEED ADDITIONS =========');
+      // console.log(feedAdditions);
       // for (var i = 0; i < feedAdditions.length; i++){
-        // console.log(feedAdditions[i]['title']);
-        // console.log(feed[i]['title']);
-        // console.log(lastFeed[i]['title'])
       // }
-      for (var i = 0; i < feedAdditions.length; i++){
-        // Make sure this matches the savePost arguments required
-        db.savePost(
-          feedAdditions[i].title, 
-          feedAdditions[i].summary, 
-          feedAdditions[i].description, 
-          feedAdditions[i].url, 
-          feedAdditions[i].image.url, 
-          feedAdditions[i].image.title,
-          moment(feedAdditions[i].pubdate).format("MMMM Do YYYY h:mm a"), 
-          feedAdditions[i].source,
-          feedAdditions[i].categories,
-          db.checkCompanyList(feedAdditions[i].title, feedAdditions[i].categories)
-          );
-      };
-      
-      // Print out companies being added
-    });
-  // });
-};
-
 // delete this line function(title, summary, description, url, imageUrl, imageTitle, companies){
       // var feedAdditions = tempFeed;
       // for (var i = 0; i < tempFeed.length; i++){

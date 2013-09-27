@@ -1,13 +1,13 @@
 changed 'main.scss' to 'main.css' in styles folder
 
-- filter by categories
-- profile
-- sharing features
 - email updates
+- big profile
+- sharing features
 - fix search so it's alpha, not just 8 
 - ask fiverr - what font, sent each piece
 - add footer
 - filter by feed
+- use typeahead-on-select to show preview/logo when co is selected
 
 - if possible, take out UI bootstrap, use sass (bower preinstall) instead
 - learn to deploy - buy domain, etc

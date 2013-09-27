@@ -11,24 +11,17 @@ var express = require('express'),
     rss = require('./scripts/rss');
 
 server.listen(port);
-
-// Run twitter
-// require('./scripts/twitter')();
+console.log('Express server listening on port '+port);
 
 // CAN PROBABLY REFACTOR CODE BELOW TO USE CONFIG.JS
-
 // save environment
 config['env'] = env;
 
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
-
-// app.set('view engine', 'ejs');
 app.use(express.cookieParser());
 // use express.session before passport, so that passport session will work
 app.use(express.session({ secret: 'keyboard cat' }));
-// Initialize Passport!  Also use passport.session() middleware, to support
-// persistent login sessions (recommended).
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(__dirname));
@@ -42,14 +35,16 @@ var db = require('./scripts/db'),
 // Routes
 require('./scripts/routes')(app, config);
 
+// Run RSS feed fetching every 2 mins
 for (var i = 0; i < rss.rssFeeds.length; i++){
   rss.getFeed(app, rss.rssFeeds[i]);
 }
 setInterval(function(){
   for (var i = 0; i < rss.rssFeeds.length; i++){
     rss.getFeed(app, rss.rssFeeds[i]);
-  }
-  }, 60000); // should run every 2 minutes (every minute currently)
+  }}, 120000); 
+
+db.saveLocalCompanyList(); // Saves list in db to local variable
 
 // io.sockets.on('connection', function (socket) {
 //         twit.stream('statuses/filter', {track: companies}, function(stream) {
@@ -61,14 +56,13 @@ setInterval(function(){
 
 
 // db.createCompanyList(); // DON'T RUN EVERY TIME
-db.saveLocalCompanyList(); // Saves list in db to local variable
 // console.log(db.loadedCompanyList);
 // setTimeout(function(){
 //   console.log('results is ', db.checkCompanyList('VMware is in the title'));
 // }, 2000);db.testPost();
-console.log('Express server listening on port '+port);
 
-
+// Run twitter
+// require('./scripts/twitter')();
 
 /*
 var routes = require('./routes');

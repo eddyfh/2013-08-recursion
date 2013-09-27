@@ -9,14 +9,6 @@
   <br>
   </div>
   <hr>
-  {{clock}}
-  <!-- <h1>Welcome to crunchlytics</h1> -->
-  <!-- <div ng-show='authenticated(tester)'> Log in below </div>
-  <div ng-show='authenticated(tester)'> if you're logged in, your username is {{user}}</div> -->
-  <!-- <h3>User: {{user.displayname}}
-  <h4>User info: {{user}}</h4> -->
-  <!-- <a href="/auth/facebook"><img src="images/login-with-facebook.png" width="154" height="22"></a> -->
-<!-- COMPLETE QUICK SEARCH FUNCTIONALITY-->
   <br><br><br>
   <h4><i>Quick Search</i></h4>
   <input id='quickSearchQuery' type = 'text' ng-model='quickSearchCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:8' | orderBy: 'company'/>
@@ -24,6 +16,139 @@
   <br><br>
   <button class="btn" ng-click="open()">Personalize</button>
   <script>document.getElementById('quickSearchQuery').focus()</script>
+
+  <br><br>
+
+  <div>
+    <tabset>
+      <!-- FIRST TAB -->
+      <tab heading='Company News' active = 'tab.active'>
+        <br>
+        <div class='well'>
+          <h4>Recent news for companies you're following:</h4>
+          <ul ng-repeat='post in rssData' class='media panel panel-info'>
+            <img class="media-object postImage" src="{{post.imageUrl}}" alt="">
+            <div class='media-body'>
+              <li ng-click='postClick($index)' class='media-heading postHeading'><b>{{post.title+':'}}</b></li>
+              <div ng-show='checkDescription($index)'>
+                <li ng-bind-html-unsafe='post.description'>
+                </li>
+                <h6><i>Original post: <a href='{{post.url}}'>{{post.url}}</a></i></h6>
+                <b>Tags:</b>
+                <div class='btn-group btn-group-xs' ng-repeat='tag in post.categories'>
+                  <button class='btn'>{{tag}}</button>&nbsp&nbsp
+                </div>
+              </div>
+              <h6>{{post.pubdate}}</h6>
+              <li>{{post.source}}</li>
+            </div>
+          </ul>
+        </div>
+      </tab>
+      <tab heading='Quick Profiles' ng-click='fetchProfiles()'>
+        <br>
+        <div class='well'>
+          <h4>Summary Profiles</h4>
+          <table class='table table-striped table-responsive table-condensed'>
+            <th>Company</th>
+            <th>Founded</th>
+            <th>Location</th>
+            <th>Employees</th>
+            <th>Description</th>
+            <th>Funding</th>
+            <th>Key People</th>
+            <th>More Info</th>
+            <tr ng-repeat='company in companyProfilesData' class='quickProfileData'>
+              <td>
+                <a href='{{company.homepage_url}}'>
+                  <img class='quickProfileImage' alt='{{company.name}}' src="http://www.crunchbase.com/{{company.image.available_sizes[0][1]}}">
+                </a>
+              </td>
+              <td>{{company.founded_month}}-{{company.founded_year}}</td>
+              <td>{{company.offices[0].city}}, {{company.offices[0].country_code}}</td>
+              <td>{{company.number_of_employees}}</td>
+              <td>{{company.description}}</td>
+              <td>{{company.total_money_raised}}</td>
+              <td>
+                <p ng-repeat='person in company.employees'>
+                  <b>{{person[0]}}:</b> {{person[1]}}
+                </p>
+              </td>
+              <td><a href='{{company.crunchbase_url}}'>Crunchbase</a></td>
+            </tr>
+          </table>
+        </div>
+      </tab>
+      <tab heading='Company Profile' disabled='tab.disabled'>
+        <br>
+        <div class='well'>Crunchlytics Data goes here</div>
+      </tab>
+      <tab heading='Analytics' disabled='tab.disabled'>
+        <br>
+        <div class='well'>Crunchlytics Data goes here</div>
+      </tab>
+    </tabset>
+  </div>
+  <br><br>
+</div>
+
+<!-- MODAL - should probably separate this code-->
+
+  <script type="text/ng-template" id="myModalContent.html">
+  <div class='modal-dialog'>
+    <div class='modal-content'>
+      <div class='modal-header'><h3>Customize Your Hound[logo?]</h3></div>
+        <div class="modal-body">
+          Enter companies to follow:
+          <br>
+          <form ng-submit='tempSave(selectedCo)'>
+            <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:20'/>
+          </form>
+          <!--<input type='submit' value='Submit' ng-click='tempSave(selectedCo)'/>-->
+          <br><br>
+          Pick keywords to follow:
+          <br>
+          <form ng-submit='tempSaveKey(selectedKey)'>
+            <input id='userKeyQuery' type = 'text' ng-model='selectedKey' typeahead='keyword for keyword in keywordList | filter:$viewValue | limitTo:20'/>
+          </form>
+          <!--<input type='submit' value='Submit' ng-click='tempSaveKey(selectedKey)'/>-->
+          <br><br>
+          <div>You are following:</div>
+          <ul>
+            <li class='modalCoList' ng-repeat="company in user.following" ng-click='removeTemp(company)'>{{company}}
+            </li>
+            <li class='modalCoList' ng-repeat="keyword in user.followingKeys" ng-click='removeTempKey(keyword)'>{{keyword}}
+            </li>
+          </ul>
+          <p>Email to receive updates:</p>
+          <input ng-model='userEmail'/>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" ng-click="ok(userEmail)">Save</button>
+          <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  <script>document.getElementById('userQuery').focus()</script>
+  </script>
+
+      <!-- <p>Your current list of searches is:</p>
+    <ul ng-repeat='listing in queries'>
+      <li>{{listing.name}}</li>
+    </ul> -->
+
+
+  <!-- <div>Twitter stream
+    <div>{{tweets.user.screen_name}}: {{tweets.text}} 
+      <img src="{{tweets.user.profile_image_url}}"/>
+    </div>
+  </div> -->
+
+<!--             <accordion-group heading="{{post.title}}" ng-repeat='post in rssData'>
+            {{post.pubdate}}
+            {{post.source}}
+            </accordion-group> -->
+
   <!-- <br><div>
       Add a company to follow:  <input id='userQuery' ng-model='userSearch'/>
 
@@ -54,148 +179,6 @@
     <!-- Enter an email to receive updates on companies: <input ng-model='userEmail'/> -->
 
     <!-- <input type='submit' value = 'Submit' ng-click='saveEmail(userEmail)'/> -->
-  <br><br>
-
-<!--             <accordion-group heading="{{post.title}}" ng-repeat='post in rssData'>
-            {{post.pubdate}}
-            {{post.source}}
-            </accordion-group> -->
-  <div>
-    <tabset>
-      <tab heading='Company News' active = 'tab.active'>
-        <!-- <p ng-click='showFollowingToggle()'>[Click to see companies you're following]</p>
-        <ul ng-repeat='listing in follow' ng-show='showFollowing'>
-          <li>{{listing}}</li>
-        </ul> -->
-        <br>
-        <div class='well'>
-          <h4>Recent news for companies you're following:</h4>
-          <ul ng-repeat='post in rssData' class='media panel panel-info'>
-            <img class="media-object postImage" src="{{post.imageUrl}}" alt="">
-            <div class='media-body'>
-              <li ng-click='postClick($index)' class='media-heading postHeading'><b>{{post.title+':'}}</b></li>
-              <div ng-show='checkDescription($index)'>
-                <li ng-bind-html-unsafe='post.description'>
-                </li>
-                <h6><i>Original post: <a href='{{post.url}}'>{{post.url}}</a></i></h6>
-                <b>Tags:</b>
-                <div class='btn-group btn-group-xs' ng-repeat='tag in post.categories'>
-                  <button class='btn'>{{tag}}</button>&nbsp&nbsp
-                </div>
-              </div>
-              <h6>{{post.pubdate}}</h6>
-              <li>{{post.source}}</li>
-            </div>
-          </ul>
-        </div>
-      </tab>
-      <tab heading='Quick Profiles' ng-click='fetchProfiles()'>
-        <br>
-        <div class='well'>
-          <h4>Summary Profiles</h4>
-          <!-- <ul class='media panel panel-info'> -->
-            <!-- <div class='media-body' > -->
-              <table class='table table-striped table-responsive table-condensed'>
-                <th>Company</th>
-                <th>Founded</th>
-                <th>Location</th>
-                <th>Employees</th>
-                <th>Description</th>
-                <th>Funding</th>
-                <th>Key People</th>
-                <th>More Info</th>
-                <tr ng-repeat='company in companyProfilesData' class='quickProfileData'>
-                  <td>
-                    <a href='{{company.homepage_url}}'>
-                      <img class='quickProfileImage' alt='{{company.name}}' src="http://www.crunchbase.com/{{company.image.available_sizes[0][1]}}">
-                    </a>
-                  </td>
-                  <td>{{company.founded_month}}/{{company.founded_year}}</td>
-                  <td>{{company.offices[0].city}}, {{company.offices[0].country_code}}</td>
-                  <td>{{company.number_of_employees}}</td>
-                  <td>{{company.description}}</td>
-                  <td>{{company.total_money_raised}}</td>
-                  <td>
-                    <p ng-repeat='person in company.employees'>
-                      <b>{{person[0]}}:</b> {{person[1]}}
-                    </p>
-                  </td>
-                  <td><a href='{{company.crunchbase_url}}'>Crunchbase</a></td>
-                </tr>
-              </table>
-            <!-- </div> -->
-          <!-- </ul> -->
-        </div>
-      </tab>
-      <tab heading='Company Profile' disabled='tab.disabled'>
-        <br>
-        <div class='well'>Crunchlytics Data goes here</div>
-      </tab>
-      <tab heading='Analytics' disabled='tab.disabled'>
-        <br>
-        <div class='well'>Crunchlytics Data goes here</div>
-      </tab>
-    </tabset>
-    <!-- <tabset vertical='true' type='navType'> -->
-
-  </div>
-  <br><br>
-
-  
-    
-    <!-- <p>Your current list of searches is:</p>
-    <ul ng-repeat='listing in queries'>
-      <li>{{listing.name}}</li>
-    </ul> -->
-
-
-  <!-- <div>Twitter stream
-    <div>{{tweets.user.screen_name}}: {{tweets.text}} 
-      <img src="{{tweets.user.profile_image_url}}"/>
-    </div>
-  </div> -->
-</div>
-
-<div></div>
-
-<!-- MODAL - should probably separate this code-->
-
-  <script type="text/ng-template" id="myModalContent.html">
-  <div class='modal-dialog'>
-    <div class='modal-content'>
-      <div class='modal-header'><h3>Customize Your Hound</h3></div>
-        <div class="modal-body">
-          Pick companies to follow:
-          <br>
-          <input id='userQuery' type = 'text' ng-model='selectedCo' typeahead='company for company in companyList | filter:$viewValue | limitTo:20'/>
-          <input type='submit' value='Submit' ng-click='tempSave(selectedCo)'/>
-          <br><br>
-          <div>Your companies (click to remove):</div>
-          <ul>
-            <li class='modalCoList' ng-repeat="company in user.following" ng-click='removeTemp(company)'>{{company}}
-            </li>
-          </ul>
-          Pick keywords to follow:
-          <br>
-          <input id='userKeyQuery' type = 'text' ng-model='selectedKey' typeahead='keyword for keyword in keywordList | filter:$viewValue | limitTo:20'/>
-          <input type='submit' value='Submit' ng-click='tempSaveKey(selectedKey)'/>
-          <br><br>
-          <div>Your keywords:</div>
-          <ul>
-            <li class='modalCoList' ng-repeat="keyword in user.followingKeys" ng-click='removeTempKey(keyword)'>{{keyword}}
-            </li>
-          </ul>
-          <p>Email to receive updates:</p>
-          <input ng-model='userEmail'/>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="ok(userEmail)">Save</button>
-          <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-        </div>
-      </div>
-    </div>
-  <script>document.getElementById('userQuery').focus()</script>
-  </script>
 
 <!--
 onerror="this.style.display='none'"
