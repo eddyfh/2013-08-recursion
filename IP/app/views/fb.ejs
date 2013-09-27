@@ -1,0 +1,31 @@
+<div>
+  <h1>Welcome to crunchlytics - you are now logged in!</h1>
+  
+  <h3>YOU ARE LOGGED IN </h3>
+  <div class="fb-login-button"></div><br>
+
+  <!-- <form method = 'post'> -->
+    Search for a company: <input id='userQuery' ng-model='userSearch'/>
+    <input type = 'submit' value = 'Submit' ng-click="userSubmit(userSearch)">
+    <p>Your current list of searches is:</p>
+    <ul ng-repeat='listing in queries'>
+      <li>{{listing.name}}</li>
+    </ul>
+
+    <p>Your current list of 'followed' companies is:</p>
+    <ul ng-repeat='listing in follow'>
+      <li>{{listing}}</li>
+    </ul>
+  <div ng-repeat='listing in queries'>
+    <img src="http://www.crunchbase.com/{{listing.image.available_sizes[0][1]}}" height='70'/>
+    <br>
+    <a href src= "{{listing.homepage_url}}">{{listing.name}}</a>
+    <div ng-bind-html-unsafe='listing.overview'></div>
+    <div>Count is </div>
+    <input type = 'submit' value = 'Follow' ng-click='userFollow(listing.name)'/>
+  </div>
+</div>
+
+<!--
+onerror="this.style.display='none'"
+  -->

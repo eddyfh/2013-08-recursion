@@ -1,0 +1,73 @@
+changed 'main.scss' to 'main.css' in styles folder
+
+- email updates
+- big profile
+- sharing features
+- fix search so it's alpha, not just 8 
+- ask fiverr - what font, sent each piece
+- add footer
+- filter by feed
+- use typeahead-on-select to show preview/logo when co is selected
+
+- if possible, take out UI bootstrap, use sass (bower preinstall) instead
+- learn to deploy - buy domain, etc
+
+BUGS
+- missing some companies still
+- on modal close, doesn't update instantly
+
+todo:
+first thing on page load is check if valid user logged in
+change response so ang knows what to render
+
+Goal - help entrepreneurs or VCs follow companies/sector
+JTBD - i need to know when things happen to companies or similar companies
+
+- Get customized view of news on competitors
+- email updates
+
+user flow
+- log in
+- enter in sector(s)
+- enter company names
+- suggest similar companies
+- show profile of company
+- allow user to follow
+for followed companies:
+- email when TC article appears or twitter mention
+custom view
+- news about companies or similar companies since last login
+- just investments/financings vs other
+480x800 mobile
+BUGS
+- make crunchbase/profile async
+
+Techmeme
+http://www.techmeme.com/feed.xml
+Pando
+http://pandodaily.com.feedsportal.com/c/35141/f/650422/index.rss
+TC
+http://techcrunch.com/rssfeeds/
+http://feeds.feedburner.com/techcrunch/fundings-exits?format=xml
+http://allthingsd.com/category/news/feed/
+http://allthingsd.com/feed/
+
+name
+crunchbase link
+homepage_url
+twitter_username
+category_code
+number_of_employees
+founded_year
+founded_month
+tag_list
+email_address
+phone_number
+overview
+image.available_sizes[0]
+
+
+
+[ceo]
+acquisitions
+products?
