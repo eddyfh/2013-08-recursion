@@ -20,6 +20,7 @@ var rssFeeds = module.exports.rssFeeds = [
 ];
 
 module.exports.getFeed = function(app, feedUrl){
+  console.log('getFeed running==========');
   var feed = [];
   request(feedUrl)
     .pipe(new FeedParser())
@@ -58,21 +59,33 @@ module.exports.getFeed = function(app, feedUrl){
         feedAdditions.push(feed[i]);
       }
       console.log('======= NEW FEED ADDITIONS =========');
+      // Below is an attempt to properly asynch saves so that it doesn't use up crazy CPU
+      // Does not seem to work, may need to switch back to for loop
+      // var i = 0;
+      // var saveLoop = function(){
+      //   if (i >= feedAdditions.length){
+      //     return;
+      //   }
+      //   setTimeout(saveLoop, 0);
       for (var i = 0; i < feedAdditions.length; i++){
         // Make sure this matches the savePost arguments required!
-        db.savePost(
-          feedAdditions[i].title,
-          feedAdditions[i].summary,
-          feedAdditions[i].description,
-          feedAdditions[i].url,
-          feedAdditions[i].image.url,
-          feedAdditions[i].image.title,
-          moment(feedAdditions[i].pubdate).format('MMMM Do YYYY h:mm a'),
-          feedAdditions[i].source,
-          feedAdditions[i].categories,
-          db.checkCompanyList(feedAdditions[i].title, feedAdditions[i].categories)
-        );
-      };
+        console.log('This is where savePost would be happening');
+        // db.savePost(
+        //   feedAdditions[i].title,
+        //   feedAdditions[i].summary,
+        //   feedAdditions[i].description,
+        //   feedAdditions[i].url,
+        //   feedAdditions[i].image.url,
+        //   feedAdditions[i].image.title,
+        //   moment(feedAdditions[i].pubdate).format('MMMM Do YYYY h:mm a'),
+        //   feedAdditions[i].source,
+        //   feedAdditions[i].categories,
+        //   db.checkCompanyList(feedAdditions[i].title, feedAdditions[i].categories)
+        // );
+        // i++;
+      }; // end saveLoop
+      // saveLoop();
+      // };
   });
 };
 

@@ -57,7 +57,7 @@ angular.module('angyeoApp')
             $scope.rssData = data;
           });
         });
-    }, 5000);
+    }, 10000);
 
     $scope.logout = function(){
       $http.post('/logout');

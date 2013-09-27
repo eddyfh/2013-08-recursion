@@ -35,15 +35,46 @@ var db = require('./scripts/db'),
 // Routes
 require('./scripts/routes')(app, config);
 
-for (var i = 0; i < rss.rssFeeds.length; i++){
+// Loop through, run RSS fetch every 2 minutes, fetching one feed every 10 seconds
+var i = 0;
+var rssLoop = function(){
+  if (i >= rss.rssFeeds.length){
+    // when loop finished
+    return;
+  }
+  setTimeout(rssLoop, 10000);
   rss.getFeed(app, rss.rssFeeds[i]);
-}
-// Run RSS feed fetching every 2 mins - this currently seems to slow down server big time
-//=======================================
+  i++;
+};
+rssLoop();
+
 setInterval(function(){
-  for (var i = 0; i < rss.rssFeeds.length; i++){
+  var i = 0;
+  var rssLoop = function(){
+    if (i >= rss.rssFeeds.length){
+      // when loop finished
+      return;
+    }
+    setTimeout(rssLoop, 10000);
     rss.getFeed(app, rss.rssFeeds[i]);
-  }}, 120000);
+    i++;
+  };
+  rssLoop();
+}, 120000);
+// if (i < rss.rssFeeds.length){
+//   rss.getFeed(app, rss.rssFeeds[i]);
+//   i++;
+// }
+
+// for (var i = 0; i < rss.rssFeeds.length; i++){
+//   rss.getFeed(app, rss.rssFeeds[i]);
+// }
+// // Run RSS feed fetching every 2 mins - this currently seems to slow down server big time
+// //=======================================
+// setInterval(function(){
+//   for (var i = 0; i < rss.rssFeeds.length; i++){
+//     rss.getFeed(app, rss.rssFeeds[i]);
+//   }}, 120000);
 //=======================================
 
 db.saveLocalCompanyList(); // Saves list in db to local variable
