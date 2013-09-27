@@ -40,10 +40,10 @@ for (var i = 0; i < rss.rssFeeds.length; i++){
 }
 // Run RSS feed fetching every 2 mins - this currently seems to slow down server big time
 //=======================================
-// setInterval(function(){
-//   for (var i = 0; i < rss.rssFeeds.length; i++){
-//     rss.getFeed(app, rss.rssFeeds[i]);
-//   }}, 120000);
+setInterval(function(){
+  for (var i = 0; i < rss.rssFeeds.length; i++){
+    rss.getFeed(app, rss.rssFeeds[i]);
+  }}, 120000);
 //=======================================
 
 db.saveLocalCompanyList(); // Saves list in db to local variable
