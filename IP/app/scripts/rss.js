@@ -69,19 +69,18 @@ module.exports.getFeed = function(app, feedUrl){
       //   setTimeout(saveLoop, 0);
       for (var i = 0; i < feedAdditions.length; i++){
         // Make sure this matches the savePost arguments required!
-        console.log('This is where savePost would be happening');
-        // db.savePost(
-        //   feedAdditions[i].title,
-        //   feedAdditions[i].summary,
-        //   feedAdditions[i].description,
-        //   feedAdditions[i].url,
-        //   feedAdditions[i].image.url,
-        //   feedAdditions[i].image.title,
-        //   moment(feedAdditions[i].pubdate).format('MMMM Do YYYY h:mm a'),
-        //   feedAdditions[i].source,
-        //   feedAdditions[i].categories,
-        //   db.checkCompanyList(feedAdditions[i].title, feedAdditions[i].categories)
-        // );
+        db.savePost(
+          feedAdditions[i].title,
+          feedAdditions[i].summary,
+          feedAdditions[i].description,
+          feedAdditions[i].url,
+          feedAdditions[i].image.url,
+          feedAdditions[i].image.title,
+          moment(feedAdditions[i].pubdate).format('MMMM Do YYYY h:mm a'),
+          feedAdditions[i].source,
+          feedAdditions[i].categories,
+          db.checkCompanyList(feedAdditions[i].title, feedAdditions[i].categories)
+        );
         // i++;
       }; // end saveLoop
       // saveLoop();

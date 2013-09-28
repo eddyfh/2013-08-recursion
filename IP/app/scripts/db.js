@@ -34,13 +34,15 @@ var postSchema = mongoose.Schema({
 });
 
 var Post = module.exports.Post = mongoose.model('Post', postSchema);
-
+LOOK INTO THIS - USES LOTS OF MEMORY EVEN WHEN NOT SAVING POST
 var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, source, categories, companies){
   Post.find({'title': title}).exec(function(err, docs){
     if(docs[0]){
+      // console.log('DUPE');
       // duplicate, so do nothing
     }
     else {
+      // console.log('NOT DUPE');
       // new post
       var newPost = new Post({
         title: title,
