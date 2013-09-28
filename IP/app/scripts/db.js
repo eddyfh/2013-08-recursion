@@ -3,6 +3,7 @@ var mongoose = require('mongoose'),
 var fs = require('fs');
 var path = require('path');
 var loadedCompanyList = module.exports.loadedCompanyList = {}; // load the company list into an object; this object looks like 
+var lcaseCompanyList = {};
 var request = require('request');
 var apikey = require('../server').apikey;
 //{companyname: crunchbaseURL} 
@@ -34,15 +35,15 @@ var postSchema = mongoose.Schema({
 });
 
 var Post = module.exports.Post = mongoose.model('Post', postSchema);
-LOOK INTO THIS - USES LOTS OF MEMORY EVEN WHEN NOT SAVING POST
+// LOOK INTO THIS - USES LOTS OF MEMORY EVEN WHEN NOT SAVING POST
 var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, source, categories, companies){
   Post.find({'title': title}).exec(function(err, docs){
     if(docs[0]){
-      // console.log('DUPE');
+      console.log('DUPE');
       // duplicate, so do nothing
     }
     else {
-      // console.log('NOT DUPE');
+      console.log('NOT DUPE');
       // new post
       var newPost = new Post({
         title: title,
@@ -101,10 +102,7 @@ var readList = function(filePath, cb){
 // Fn takes an article title, checks for any company/category matches, returns array of matches
 var checkCompanyList = module.exports.checkCompanyList = function(title, categories){
   var results = [];
-  var lcaseCompanyList=[];
-  for (var key in loadedCompanyList){
-    lcaseCompanyList[key.toLowerCase()] = loadedCompanyList[key];
-  }
+
   titleWords = title.toLowerCase().split(' ');
   wordList = titleWords.concat(categories);
   for (var i = 0; i < wordList.length; i++){
@@ -135,31 +133,32 @@ var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
     console.log(docs.length,' companies in DB');
     for (var i = 0; i < docs.length; i++){
       loadedCompanyList[docs[i].name] = docs[i].crunchUrl;
+      loadedCompanyList[docs[i].name.toLowerCase()] = docs[i].crunchUrl;
     }
-    console.log('Company list saved to variable on server');
+    console.log('Company lists saved to variable on server');
   });
 };
 // ==============================================================
 // BELOW IS TO GET TC COMPANIES MASTER LIST (JUST USED OCCASIONALLY)
-// var getAllCos = module.exports.getAllCos = function(cb){
-//   console.log('Retrieving all companies list from Crunchbase...');
-//   request.get('http://api.crunchbase.com/v/1/companies.js?api_key='+apikey,
-//     function(e,response,body){
-//       console.log('Finished retrieving!');
-//       var data = JSON.parse(body);
-//       var i = 0;
-//       function next(){
-//         if(i >= data.length) return cb();
-//         saveCompany(data[i].name, data[i].permalink, data[i].category_code, function(err){
-//           if(err) return cb(err);
-//           console.log('saved', i);
-//           i++;
-//           next();
-//         });
-//       }
-//       next(0);
-//   });
-// };
+var getAllCos = module.exports.getAllCos = function(cb){
+  console.log('Retrieving all companies list from Crunchbase...');
+  request.get('http://api.crunchbase.com/v/1/companies.js?api_key='+apikey,
+    function(e,response,body){
+      console.log('Finished retrieving!');
+      var data = JSON.parse(body);
+      var i = 0;
+      function next(){
+        if(i >= data.length) return cb();
+        saveCompany(data[i].name, data[i].permalink, data[i].category_code, function(err){
+          if(err) return cb(err);
+          console.log('saved', i);
+          i++;
+          next();
+        });
+      }
+      next(0);
+  });
+};
 
 //=================================================
 // This saves companies from TC with above function

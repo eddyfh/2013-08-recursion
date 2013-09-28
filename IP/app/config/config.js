@@ -4,8 +4,8 @@ var path = require('path'),
 module.exports = {
   development: {
     db: 'mongodb://localhost/crunchtest',
-    root: rootPath,
-    app: {
+    root: rootPath
+    , app: {
       port: 8001
       //, secret: 'blahblah'
     }

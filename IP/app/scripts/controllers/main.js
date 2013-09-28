@@ -51,13 +51,13 @@ angular.module('angyeoApp')
     };
 
     // Runs RSS refresh every 5 seconds
-    setInterval(function(){
-        $scope.$apply(function() {
-          sharedServices.showRSS($scope.user, function(data){
-            $scope.rssData = data;
-          });
-        });
-    }, 10000);
+    // setInterval(function(){
+    //     $scope.$apply(function() {
+    //       sharedServices.showRSS($scope.user, function(data){
+    //         $scope.rssData = data;
+    //       });
+    //     });
+    // }, 10000);
 
     $scope.logout = function(){
       $http.post('/logout');

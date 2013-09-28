@@ -4,14 +4,17 @@ var express = require('express'),
     server = http.createServer(app),
     // io = module.exports.io = require('socket.io').listen(server),
     env = process.env.NODE_ENV || 'development',
-    port = 8000,
     config = module.exports.config = require('./config/config')[env],
     apikey = module.exports.apikey = 'a72hgev95qzstgam5aukbeqe',
     fb = require('./config/passport')(app),
     rss = require('./scripts/rss');
+    app.configure(function(){
+      app.set('port', process.env.PORT || 8000);
+      console.log(app.get('port'));
+    });
 
-server.listen(port);
-console.log('Express server listening on port '+port);
+server.listen(app.get('port'));
+console.log('Express server listening on port ');
 
 // CAN PROBABLY REFACTOR CODE BELOW TO USE CONFIG.JS
 // save environment
