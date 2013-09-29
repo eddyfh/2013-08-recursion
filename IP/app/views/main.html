@@ -27,7 +27,7 @@
         <div class='well'>
           <h4>Recent news for companies you're following:</h4>
           <ul ng-repeat='post in rssData' class='media panel panel-info'>
-            <img class="media-object postImage" src="{{post.imageUrl}}" alt="">
+            <img class="media-object postImage" src="{{post.imageUrl}}">
             <div class='media-body'>
               <li ng-click='postClick($index)' class='media-heading postHeading'><b>{{post.title+':'}}</b></li>
               <div ng-show='checkDescription($index)'>

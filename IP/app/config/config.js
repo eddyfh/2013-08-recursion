@@ -3,7 +3,8 @@ var path = require('path'),
 
 module.exports = {
   development: {
-    db: 'mongodb://localhost/crunchtest',
+    // db: 'mongodb://localhost/crunchtest',
+    db: 'mongodb://172.31.22.98/crunchtest',
     root: rootPath
     , app: {
       port: 8001

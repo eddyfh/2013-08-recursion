@@ -8,6 +8,8 @@ angular.module('angyeoApp')
     $scope.showDescription = {};
     $scope.showFollowing = false;
     $scope.companyList=[];
+    $scope.companyProfilesData = [];
+
     // May want to turn into a service
     $http.get('/getCompanyList').success(function(data){
       for (var key in data){
@@ -15,24 +17,26 @@ angular.module('angyeoApp')
       }
     });
     $scope.fetchProfiles = function(){
-    console.log('Running fetchProfiles');
-    $http({method: 'GET', url: '/api/crunchbase/profile', params: {'companies': $scope.user.following}}).success(function(data){
-      $scope.companyProfilesData = data;
+      console.log('Running fetchProfiles');
+      $http({method: 'GET', url: '/api/crunchbase/profile', params: {'companies': $scope.user.following}}).success(function(data){
+        $scope.companyProfilesData = data;
+        console.log('Fetched data!');
+        console.log($scope.companyProfilesData);
 
-      // Function finds CEO/founders, save to companyProfilesData.employees as [name, title]
-      for (var i = 0; i < $scope.companyProfilesData.length; i++){ // each company
-        var people = $scope.companyProfilesData[i].relationships;
-        $scope.companyProfilesData[i].employees=[];
-        for (var j = 0; j < people.length;j++){                    //each rel'p
-          if (people[j].title.toLowerCase().indexOf('ceo') !== -1 || people[j].title.toLowerCase().indexOf('founder') !== -1){
-            var person = people[j].person.first_name+' '+people[j].person.last_name;
-            $scope.companyProfilesData[i].employees.push([person, people[j].title]);
-          }
-        } // person close
-      } // company close
-      }).error(function(data, status){
-          console.log('ERROR when fetching crunchbase profile data!');
-        });
+        // Function finds CEO/founders, save to companyProfilesData.employees as [name, title]
+        for (var i = 0; i < $scope.companyProfilesData.length; i++){ // each company
+          var people = $scope.companyProfilesData[i].relationships;
+          $scope.companyProfilesData[i].employees=[];
+          for (var j = 0; j < people.length;j++){                    //each rel'p
+            if (people[j].title.toLowerCase().indexOf('ceo') !== -1 || people[j].title.toLowerCase().indexOf('founder') !== -1){
+              var person = people[j].person.first_name+' '+people[j].person.last_name;
+              $scope.companyProfilesData[i].employees.push([person, people[j].title]);
+            }
+          } // person close
+        } // company close
+        }).error(function(data, status){
+            console.log('ERROR when fetching crunchbase profile data!');
+          });
     };
 
     // Retrieves logged in user's data and saves to $scope.user
@@ -51,13 +55,13 @@ angular.module('angyeoApp')
     };
 
     // Runs RSS refresh every 5 seconds
-    // setInterval(function(){
-    //     $scope.$apply(function() {
-    //       sharedServices.showRSS($scope.user, function(data){
-    //         $scope.rssData = data;
-    //       });
-    //     });
-    // }, 10000);
+    setInterval(function(){
+        $scope.$apply(function() {
+          sharedServices.showRSS($scope.user, function(data){
+            $scope.rssData = data;
+          });
+        });
+    }, 5000);
 
     $scope.logout = function(){
       $http.post('/logout');
@@ -77,7 +81,6 @@ angular.module('angyeoApp')
         return false;
       }
     };
-    $scope.companyProfilesData = [];
 
     $scope.authenticated = function(user){
       console.log(user);

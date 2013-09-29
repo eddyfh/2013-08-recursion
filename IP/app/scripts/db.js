@@ -39,11 +39,11 @@ var Post = module.exports.Post = mongoose.model('Post', postSchema);
 var savePost = module.exports.savePost = function(title, summary, description, url, imageUrl, imageTitle, pubdate, source, categories, companies){
   Post.find({'title': title}).exec(function(err, docs){
     if(docs[0]){
-      console.log('DUPE');
+      // console.log('DUPE');
       // duplicate, so do nothing
     }
     else {
-      console.log('NOT DUPE');
+      // console.log('NOT DUPE');
       // new post
       var newPost = new Post({
         title: title,
@@ -139,8 +139,10 @@ var saveLocalCompanyList = module.exports.saveLocalCompanyList = function(){
   });
 };
 // ==============================================================
-// BELOW IS TO GET TC COMPANIES MASTER LIST (JUST USED OCCASIONALLY)
+// BELOW IS TO GET TC COMPANIES MASTER LIST (JUST USED ON SERVER LOAD)
 var getAllCos = module.exports.getAllCos = function(cb){
+  Company.find().remove();
+  console.log('Existing company DB deleted');
   console.log('Retrieving all companies list from Crunchbase...');
   request.get('http://api.crunchbase.com/v/1/companies.js?api_key='+apikey,
     function(e,response,body){
@@ -161,8 +163,8 @@ var getAllCos = module.exports.getAllCos = function(cb){
 };
 
 //=================================================
-// This saves companies from TC with above function
-// getAllCos(function(){});
+// This saves 180k companies from TC with above function
+getAllCos(function(){});
 //=================================================
 
 // lastPost saves down all the most recent posts for each feed
